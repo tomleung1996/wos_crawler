@@ -12,6 +12,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
     name = 'wos_advanced_query_spider'
     allowed_domains = ['webofknowledge.com']
     start_urls = ['http://www.webofknowledge.com']
+    timestamp = str(time.strftime('%Y-%m-%d-%H.%M.%S',time.localtime(time.time())))
 
     #提取URL中的SID和QID所需要的正则表达式
     sid_pattern = r'SID=(\w+)&'
@@ -19,6 +20,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
 
     #在这里输入检索式
     query = 'TS=information behavior and PY=2018'
+
 
     def parse(self, response):
         """
@@ -187,8 +189,8 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         start = response.meta['start']
         end = response.meta['end']
 
-        #按期刊名称保存文件
-        filename = 'output/advanced_query/{}/{}.txt'.format(str(time.strftime('%Y-%m-%d',time.localtime(time.time()))),str(start) + '-' + str(end))
+        #按日期时间保存文件
+        filename = 'output/advanced_query/{}/{}.txt'.format(self.timestamp,str(start) + '-' + str(end))
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'w', encoding='utf-8') as file:
             file.write(response.text)
