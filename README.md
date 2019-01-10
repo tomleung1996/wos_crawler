@@ -15,6 +15,8 @@ A crawler that downloads bibliographic data from Web of Science, given:
 
 使用图形界面 / Using GUI
 
+- 可以使用编译好的程序 / Executable program：[Wos_GUI_Crawler-v0.1-alpha](https://github.com/tomleung1996/wos_crawler/releases)
+
 - 将`main.py`的第30行取消注释，调用`crawl_by_gui()`，然后根据指示进行操作（GUI在爬取时会发生假死情况，请耐心等待爬取结束）
 
 - Uncomment line 30 in `main.py`, calling `crawl_by_gui()`, and follow the guide (GUI will become no response while scraping, please be patient)
