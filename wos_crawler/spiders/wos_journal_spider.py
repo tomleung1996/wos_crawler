@@ -6,6 +6,7 @@ from scrapy.http import FormRequest
 import time
 from bs4 import BeautifulSoup
 import os
+import sys
 
 
 class WosJournalSpiderSpider(scrapy.Spider):
@@ -19,7 +20,21 @@ class WosJournalSpiderSpider(scrapy.Spider):
 
     #待爬取期刊列表和列表存放的位置
     JOURNAL_LIST = []
-    JOURNAL_LIST_PATH = r'C:\Users\Tom\PycharmProjects\wos_crawler\wos_crawler\input\journal_list.txt'
+    # JOURNAL_LIST_PATH = r'C:\Users\Tom\PycharmProjects\wos_crawler\wos_crawler\input\journal_list.txt'
+    JOURNAL_LIST_PATH = None
+    output_path_prefix = ''
+
+    def __init__(self, journal_list_path = None, output_path = '../output', *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.JOURNAL_LIST_PATH = journal_list_path
+        self.output_path_prefix = output_path
+
+        if journal_list_path is None:
+            print('请指定期刊列表')
+            sys.exit(-1)
+        if output_path is None:
+            print('请指定有效的输出路径')
+            sys.exit(-1)
 
     #在爬虫运行后进行一次期刊列表的初始化工作，将文件中的期刊名读入
     def start_requests(self):
@@ -40,7 +55,7 @@ class WosJournalSpiderSpider(scrapy.Spider):
         :return:
         """
         if len(self.JOURNAL_LIST) <= 0:
-            print('**待爬取期刊列表为空，不再产生新的异步请求，请等待现有的请求执行完成**')
+            print('**待爬取期刊已全部加入队列，不再产生新的异步请求，请等待现有的请求执行完成**')
             return
 
         #获得当前要爬取的期刊名称
@@ -210,7 +225,8 @@ class WosJournalSpiderSpider(scrapy.Spider):
         end = response.meta['end']
 
         #按期刊名称保存文件
-        filename = 'output/{}/{}.txt'.format(journal_name, journal_name + '-' + str(start) + '-' + str(end))
+
+        filename = self.output_path_prefix + '/journal/{}/{}.txt'.format(journal_name, journal_name + '-' + str(start) + '-' + str(end))
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'w', encoding='utf-8') as file:
             file.write(response.text)

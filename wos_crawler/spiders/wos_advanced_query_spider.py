@@ -6,6 +6,7 @@ from scrapy.http import FormRequest
 import time
 from bs4 import BeautifulSoup
 import os
+import sys
 
 
 class WosAdvancedQuerySpiderSpider(scrapy.Spider):
@@ -19,7 +20,21 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
     qid_pattern = r'qid=(\d+)&'
 
     #在这里输入检索式
-    query = 'TS=information behavior and PY=2018'
+    query = None
+
+    output_path_prefix = ''
+
+    def __init__(self, query = None, output_path = '../output', *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.query = query
+        self.output_path_prefix = output_path
+
+        if query is None:
+            print('请指定检索式')
+            sys.exit(-1)
+        if output_path is None:
+            print('请指定有效的输出路径')
+            sys.exit(-1)
 
 
     def parse(self, response):
@@ -190,7 +205,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         end = response.meta['end']
 
         #按日期时间保存文件
-        filename = 'output/advanced_query/{}/{}.txt'.format(self.timestamp,str(start) + '-' + str(end))
+        filename = self.output_path_prefix + '/advanced_query/{}/{}.txt'.format(self.timestamp,str(start) + '-' + str(end))
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'w', encoding='utf-8') as file:
             file.write(response.text)
