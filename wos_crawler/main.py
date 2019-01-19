@@ -27,8 +27,8 @@ def crawl_by_gui():
 
 if __name__ == '__main__':
     # 按期刊下载
-    crawl_by_journal(journal_list_path=r'C:\Users\Tom\PycharmProjects\wos_crawler\input\journal_list_test.txt',
-                     output_path='../output', output_format='bibtex', document_type='letter')
+    # crawl_by_journal(journal_list_path=r'C:\Users\Tom\PycharmProjects\wos_crawler\input\journal_list_test.txt',
+    #                  output_path='../output', output_format='bibtex', document_type='letter')
 
     # 按检索式下载
     # crawl_by_query(query='TS=information science AND PY=2018',
