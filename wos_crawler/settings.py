@@ -10,7 +10,7 @@
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = 'wos_crawler'
-LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'ERROR'
 SPIDER_MODULES = ['wos_crawler.spiders']
 NEWSPIDER_MODULE = 'wos_crawler.spiders'
 

@@ -15,23 +15,21 @@ A crawler that downloads bibliographic data from Web of Science, given:
 
 使用图形界面 / Using GUI
 
-- 可以使用编译好的程序 / Executable program：[Wos_GUI_Crawler-v0.1-alpha](https://github.com/tomleung1996/wos_crawler/releases)
+- 将`main.py`的第38行取消注释，调用`crawl_by_gui()`，然后根据指示进行操作（GUI在爬取时会发生假死情况，请耐心等待爬取结束）
 
-- 将`main.py`的第30行取消注释，调用`crawl_by_gui()`，然后根据指示进行操作（GUI在爬取时会发生假死情况，请耐心等待爬取结束）
-
-- Uncomment line 30 in `main.py`, calling `crawl_by_gui()`, and follow the guide (GUI will become no response while scraping, please be patient)
+- Uncomment line 38 in `main.py`, calling `crawl_by_gui()`, and follow the guide (GUI will become no response while scraping, please be patient)
 
 给定期刊列表 / Given a list of journals' name
 
-- 将`main.py`的第22-23行取消注释，调用`crawl_by_journal()`，传递期刊列表文件路径和输出保存路径
+- 将`main.py`的第30-31行取消注释，调用`crawl_by_journal()`，传递期刊列表文件路径和输出保存路径
 
-- Uncomment line 22-23 in `main.py`, calling `crawl_by_journal()`, passing journal list file path and output path to that function.
+- Uncomment line 30-31 in `main.py`, calling `crawl_by_journal()`, passing journal list file path and output path to that function.
 
 给定高级检索式 / Given a advanced query
 
-- 将`main.py`的第26-27行取消注释，调用`crawl_by_query()`，传递检索式和输出保存路径
+- 将`main.py`的第34-35行取消注释，调用`crawl_by_query()`，传递检索式和输出保存路径
 
-- Uncomment line 26-27 in `main.py`, calling `crawl_by_query()`, passing query and output path to that function.
+- Uncomment line 34-35 in `main.py`, calling `crawl_by_query()`, passing query and output path to that function.
 
 
 
