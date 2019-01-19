@@ -15,32 +15,32 @@ A crawler that downloads bibliographic data from Web of Science, given:
 
 使用图形界面 / Using GUI
 
-- 将`main.py`的第38行取消注释，调用`crawl_by_gui()`，然后根据指示进行操作（GUI在爬取时会发生假死情况，请耐心等待爬取结束）
+- 将`main.py`的第36行取消注释，调用`crawl_by_gui()`，然后根据指示进行操作（GUI在爬取时会发生假死情况，请耐心等待爬取结束）
 
-- Uncomment line 38 in `main.py`, calling `crawl_by_gui()`, and follow the guide (GUI will become no response while scraping, please be patient)
+- Uncomment line 36 in `main.py`, calling `crawl_by_gui()`, and follow the guide (GUI will become no response while scraping, please be patient)
 
 给定期刊列表 / Given a list of journals' name
 
-- 将`main.py`的第30-31行取消注释，调用`crawl_by_journal()`，传递期刊列表文件路径和输出保存路径
+- 将`main.py`的第28-29行取消注释，调用`crawl_by_journal()`，传递期刊列表文件路径、输出保存路径、输出格式和目标文献类型
 
-- Uncomment line 30-31 in `main.py`, calling `crawl_by_journal()`, passing journal list file path and output path to that function.
+- Uncomment line 28-29 in `main.py`, calling `crawl_by_journal()`, passing journal list file path, output path, output format and document type to that function.
 
 给定高级检索式 / Given a advanced query
 
-- 将`main.py`的第34-35行取消注释，调用`crawl_by_query()`，传递检索式和输出保存路径
+- 将`main.py`的第32-33行取消注释，调用`crawl_by_query()`，传递检索式、输出保存路径、输出格式和目标文献类型
 
-- Uncomment line 34-35 in `main.py`, calling `crawl_by_query()`, passing query and output path to that function.
+- Uncomment line 32-33 in `main.py`, calling `crawl_by_query()`, passing query, output path, output format and document type to that function.
 
 
 
 ## 输出格式 / Output format
 
-输出格式为WoS导出的纯文本（全部字段，包含参考文献），默认保存于`output`文件夹。
+输出格式为包含全部字段及参考文献的纯文本/Bibtex/HTML/Tab分隔文本文件，默认保存于`output`文件夹。
 
 - 如果使用的是期刊列表进行爬取，则输出文件存放的方式为每个期刊一个独立文件夹
 - 如果使用的是高级检索式进行爬取，则输出文件的存放文件夹命名为爬虫启动的时间
 
-The output format is WoS Plain Text, the same as the file you manually download from Web of Science. The files are stored in the `output` folder if not specified.
+The output format can be WoS Plain Text/Bibtex/HTML/Tab-delimited file, the same as the file you manually download from Web of Science. The files are stored in the `output` folder if not specified.
 
 - If you run the crawler in the journal list mode, each journal will have its own folder
 - If you run the crawler in the advanced query mode, the result folder will be named by current time.

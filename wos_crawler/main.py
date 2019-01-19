@@ -11,7 +11,6 @@ def crawl_by_journal(journal_list_path, output_path='../output', document_type='
 
 
 def crawl_by_query(query, output_path='../output', document_type='Article', output_format='fieldtagged'):
-
     cmdline.execute(
         r'scrapy crawl wos_advanced_query_spider -a output_path={} -a output_format={}'.format(
             output_path, output_format).split() +
@@ -34,5 +33,5 @@ if __name__ == '__main__':
     #                output_path='../output', output_format='bibtex', document_type='meeting abstract')
 
     # 使用GUI下载
-    crawl_by_gui()
+    # crawl_by_gui()
     pass
