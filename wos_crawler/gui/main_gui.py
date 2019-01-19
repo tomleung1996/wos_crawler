@@ -70,7 +70,7 @@ class GuiCrawler(QMainWindow):
 
         output_format = self.ui.comboBoxOutputFormat.currentText()
         print('保存格式：' + output_format)
-        if output_format == 'Plain text':
+        if output_format == 'Plain Text':
             output_format = 'fieldtagged'
         elif output_format == 'Tab-delimited (Win)':
             output_format = 'tabWinUnicode'
