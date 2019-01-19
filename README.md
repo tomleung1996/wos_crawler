@@ -13,9 +13,9 @@ A crawler that downloads bibliographic data from Web of Science, given:
 
 ## 使用方法 / Usage
 
-*注意：本爬虫以作者所在学校所购买的Web of Science数据库为基础开发，包含SCI, SSCI, AHCI, ISTP, ISSHP, ESCI, CCR, IC。其他学校的同学如果购买的数据库种类不同，爬虫将无法工作，需要将spider提交表单的`editions`改为自己学校所购买的数据库列表方可正常使用*
+**注意：本爬虫以作者所在学校所购买的Web of Science数据库为基础开发，包含SCI, SSCI, AHCI, ISTP, ISSHP, ESCI, CCR, IC。其他学校的同学如果购买的数据库种类不同，爬虫将无法工作，需要将spider提交表单的`editions`改为自己学校所购买的数据库列表方可正常使用**
 
-*Notice: This crawler is developed based on the Web of Science databases that my school have purchased, including SCI, SSCI, AHCI, ISTP, ISSHP, ESCI, CCR, IC. Errors may occur if your school have purchased different kinds of databases. If so, please modify the `editions` to the list of your databases
+**Notice: This crawler is developed based on the Web of Science databases that my school have purchased, including SCI, SSCI, AHCI, ISTP, ISSHP, ESCI, CCR, IC. Errors may occur if your school have purchased different kinds of databases. If so, please modify the `editions` to the list of your databases**
 
 使用图形界面 / Using GUI
 
