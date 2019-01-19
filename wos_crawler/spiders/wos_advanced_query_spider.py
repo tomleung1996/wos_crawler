@@ -12,22 +12,30 @@ import sys
 class WosAdvancedQuerySpiderSpider(scrapy.Spider):
     name = 'wos_advanced_query_spider'
     allowed_domains = ['webofknowledge.com']
-    start_urls = ['http://www.webofknowledge.com']
+    start_urls = ['http://www.webofknowledge.com/']
     timestamp = str(time.strftime('%Y-%m-%d-%H.%M.%S',time.localtime(time.time())))
 
     #提取URL中的SID和QID所需要的正则表达式
     sid_pattern = r'SID=(\w+)&'
     qid_pattern = r'qid=(\d+)&'
 
+    #目标文献类型
+    document_type = 'Article'
+
+    #导出文献格式
+    output_format = 'fieldtagged'
+
     #在这里输入检索式
     query = None
 
     output_path_prefix = ''
 
-    def __init__(self, query = None, output_path = '../output', *args, **kwargs):
+    def __init__(self, query = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.query = query
         self.output_path_prefix = output_path
+        self.document_type = document_type
+        self.output_format = output_format
 
         if query is None:
             print('请指定检索式')
@@ -75,7 +83,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
             "value(select2)": "LA",
             "value(input2)": "",
             "value(select3)": "DT",
-            "value(input3)": "Article",
+            "value(input3)": self.document_type,
             "value(limitCount)": "14",
             "limitStatus": "collapsed",
             "ss_lemmatization": "On",
@@ -187,7 +195,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
                 "markFrom": str(start),
                 "markTo": str(end),
                 "fields_selection": "HIGHLY_CITED HOT_PAPER OPEN_ACCESS PMID USAGEIND AUTHORSIDENTIFIERS ACCESSION_NUM FUNDING SUBJECT_CATEGORY JCR_CATEGORY LANG IDS PAGEC SABBR CITREFC ISSN PUBINFO KEYWORDS CITTIMES ADDRS CONFERENCE_SPONSORS DOCTYPE CITREF ABSTRACT CONFERENCE_INFO SOURCE TITLE AUTHORS  ",
-                "save_options": "fieldtagged"
+                "save_options": self.output_format
             }
 
             #将下载地址yield一个FormRequest给download_result函数，传递有用参数
@@ -198,6 +206,15 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
                                      'start': start, 'end': end})
 
     def download_result(self, response):
+
+        file_postfix_pattern = re.compile(r'filename=\w+\.(\w+)$')
+        file_postfix = re.search(file_postfix_pattern, response.headers[b'Content-Disposition'].decode())
+        if file_postfix is not None:
+            file_postfix = file_postfix.group(1)
+        else:
+            print('找不到文件原始后缀，使用txt后缀保存')
+            file_postfix = 'txt'
+
         sid = response.meta['sid']
         query = response.meta['query']
         qid = response.meta['qid']
@@ -205,7 +222,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         end = response.meta['end']
 
         #按日期时间保存文件
-        filename = self.output_path_prefix + '/advanced_query/{}/{}.txt'.format(self.timestamp,str(start) + '-' + str(end))
+        filename = self.output_path_prefix + '/advanced_query/{}/{}.{}'.format(self.timestamp,str(start) + '-' + str(end),file_postfix)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'w', encoding='utf-8') as file:
             file.write(response.text)

@@ -12,11 +12,17 @@ import sys
 class WosJournalSpiderSpider(scrapy.Spider):
     name = 'wos_journal_spider'
     allowed_domains = ['webofknowledge.com']
-    start_urls = ['http://www.webofknowledge.com']
+    start_urls = ['http://www.webofknowledge.com/']
 
     #提取URL中的SID和QID所需要的正则表达式
     sid_pattern = r'SID=(\w+)&'
     qid_pattern = r'qid=(\d+)&'
+
+    # 目标文献类型
+    document_type = 'Article'
+
+    # 导出文献格式
+    output_format = 'fieldtagged'
 
     #待爬取期刊列表和列表存放的位置
     JOURNAL_LIST = []
@@ -24,10 +30,12 @@ class WosJournalSpiderSpider(scrapy.Spider):
     JOURNAL_LIST_PATH = None
     output_path_prefix = ''
 
-    def __init__(self, journal_list_path = None, output_path = '../output', *args, **kwargs):
+    def __init__(self, journal_list_path = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.JOURNAL_LIST_PATH = journal_list_path
         self.output_path_prefix = output_path
+        self.document_type = document_type
+        self.output_format = output_format
 
         if journal_list_path is None:
             print('请指定期刊列表')
@@ -91,7 +99,7 @@ class WosJournalSpiderSpider(scrapy.Spider):
             "value(select2)": "LA",
             "value(input2)": "",
             "value(select3)": "DT",
-            "value(input3)": "Article",
+            "value(input3)": self.document_type,
             "value(limitCount)": "14",
             "limitStatus": "collapsed",
             "ss_lemmatization": "On",
@@ -206,7 +214,7 @@ class WosJournalSpiderSpider(scrapy.Spider):
                 "markFrom": str(start),
                 "markTo": str(end),
                 "fields_selection": "HIGHLY_CITED HOT_PAPER OPEN_ACCESS PMID USAGEIND AUTHORSIDENTIFIERS ACCESSION_NUM FUNDING SUBJECT_CATEGORY JCR_CATEGORY LANG IDS PAGEC SABBR CITREFC ISSN PUBINFO KEYWORDS CITTIMES ADDRS CONFERENCE_SPONSORS DOCTYPE CITREF ABSTRACT CONFERENCE_INFO SOURCE TITLE AUTHORS  ",
-                "save_options": "fieldtagged"
+                "save_options": self.output_format
             }
 
             #将下载地址yield一个FormRequest给download_result函数，传递有用参数
@@ -217,6 +225,15 @@ class WosJournalSpiderSpider(scrapy.Spider):
                                      'start': start, 'end': end})
 
     def download_result(self, response):
+
+        file_postfix_pattern = re.compile(r'filename=\w+\.(\w+)$')
+        file_postfix = re.search(file_postfix_pattern, response.headers[b'Content-Disposition'].decode())
+        if file_postfix is not None:
+            file_postfix = file_postfix.group(1)
+        else:
+            print('找不到文件原始后缀，使用txt后缀保存')
+            file_postfix = 'txt'
+
         sid = response.meta['sid']
         journal_name = response.meta['journal_name']
         query = response.meta['query']
@@ -226,7 +243,7 @@ class WosJournalSpiderSpider(scrapy.Spider):
 
         #按期刊名称保存文件
 
-        filename = self.output_path_prefix + '/journal/{}/{}.txt'.format(journal_name, journal_name + '-' + str(start) + '-' + str(end))
+        filename = self.output_path_prefix + '/journal/{}/{}.{}'.format(journal_name, journal_name + '-' + str(start) + '-' + str(end), file_postfix)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'w', encoding='utf-8') as file:
             file.write(response.text)

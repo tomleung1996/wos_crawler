@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>482</width>
-    <height>275</height>
+    <width>487</width>
+    <height>519</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>30</y>
+      <y>40</y>
       <width>99</width>
       <height>28</height>
      </rect>
@@ -36,8 +36,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>190</y>
+      <x>190</x>
+      <y>430</y>
       <width>99</width>
       <height>28</height>
      </rect>
@@ -53,7 +53,7 @@
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>140</y>
+      <y>310</y>
       <width>99</width>
       <height>28</height>
      </rect>
@@ -62,69 +62,152 @@
      <string>选择保存路径</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>11</y>
+      <y>10</y>
       <width>331</width>
-      <height>161</height>
+      <height>396</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_5">
+    <layout class="QVBoxLayout" name="verticalLayout_7">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <widget class="QRadioButton" name="radioButtonJournal">
-           <property name="text">
-            <string>期刊列表爬取</string>
-           </property>
-          </widget>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QRadioButton" name="radioButtonJournal">
+             <property name="text">
+              <string>期刊列表爬取</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEditJournal">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="readOnly">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEditJournal">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="readOnly">
-            <bool>false</bool>
-           </property>
-          </widget>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QRadioButton" name="radioButtonQuery">
+             <property name="text">
+              <string>高级检索式爬取</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTextEdit" name="textEditQuery"/>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <widget class="QRadioButton" name="radioButtonQuery">
+          <widget class="QLabel" name="labelOutputPath">
            <property name="text">
-            <string>高级检索式爬取</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
+            <string>保存路径</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEditQuery"/>
+          <widget class="QLineEdit" name="lineEditOutputPath"/>
          </item>
         </layout>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QLabel" name="labelOutputPath">
-         <property name="text">
-          <string>保存路径</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>文献类型</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBoxDocumentType">
+           <item>
+            <property name="text">
+             <string>All document types</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Article</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEditOutputPath"/>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>保存格式</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBoxOutputFormat">
+           <item>
+            <property name="text">
+             <string>Plain Text</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Bibtex</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>HTML</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Tab-delimited (Win)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Tab-delimited (Mac)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Tab-delimited (Win, UTF-8)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Tab-delimited (Mac, UTF-8)</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -136,7 +219,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>482</width>
+     <width>487</width>
      <height>26</height>
     </rect>
    </property>
