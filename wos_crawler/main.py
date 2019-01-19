@@ -19,10 +19,9 @@ def crawl_by_query(query, output_path='../output', document_type='Article', outp
 
 
 def crawl_by_gui():
-    app = QApplication(sys.argv)
     gui_crawler = GuiCrawler()
     gui_crawler.show()
-    sys.exit(app.exec_())
+    reactor.run()
 
 
 if __name__ == '__main__':
@@ -31,9 +30,9 @@ if __name__ == '__main__':
     #                  output_path='../output', output_format='bibtex', document_type='letter')
 
     # 按检索式下载
-    crawl_by_query(query='TS=information science AND PY=2018',
-                   output_path='../output', output_format='bibtex', document_type='meeting abstract')
+    # crawl_by_query(query='TS=information science AND PY=2018',
+    #                output_path='../output', output_format='bibtex', document_type='meeting abstract')
 
     # 使用GUI下载
-    # crawl_by_gui()
+    crawl_by_gui()
     pass

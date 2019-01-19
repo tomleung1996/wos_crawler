@@ -1,26 +1,15 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
-
-app = QApplication(sys.argv)
-
-import qt5reactor
-
-qt5reactor.install()
-
-from twisted.internet import reactor
 from gui.gui_crawler import *
 from scrapy.utils.project import get_project_settings
-from scrapy.crawler import CrawlerRunner
+from scrapy.crawler import CrawlerProcess
 from spiders.wos_advanced_query_spider import WosAdvancedQuerySpiderSpider
 from spiders.wos_journal_spider import WosJournalSpiderSpider
 
 
-# TS=INFORMATION SCIENCE AND PY=2018
-
 class GuiCrawler(QMainWindow):
     def __init__(self):
         super().__init__()
-
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -68,24 +57,8 @@ class GuiCrawler(QMainWindow):
         else:
             self.ui.pushButtonStartCrawler.setEnabled(False)
 
-    def disable_all_ui(self):
-        self.ui.pushButtonStartCrawler.setEnabled(False)
-        self.ui.comboBoxOutputFormat.setEnabled(False)
-        self.ui.comboBoxDocumentType.setEnabled(False)
-        self.ui.lineEditOutputPath.setEnabled(False)
-        self.ui.lineEditJournal.setEnabled(False)
-        self.ui.pushButtonOutputPath.setEnabled(False)
-        self.ui.pushButtonJournal.setEnabled(False)
-        self.ui.radioButtonQuery.setEnabled(False)
-        self.ui.radioButtonJournal.setEnabled(False)
-        self.ui.textEditQuery.setEnabled(False)
-
-
     # 开始爬取
     def start_crawler(self):
-
-        self.disable_all_ui()
-
         output_path = self.ui.lineEditOutputPath.text()
         print('保存路径为：' + output_path)
 
@@ -109,32 +82,24 @@ class GuiCrawler(QMainWindow):
             output_format = 'tabMacUTF8'
         output_format = output_format.lower()
 
-        crawler = CrawlerRunner(get_project_settings())
-        d = None
+        process = CrawlerProcess(get_project_settings())
+
         if self.ui.radioButtonJournal.isChecked():
             journal_list_path = self.ui.lineEditJournal.text()
             print('期刊列表存放路径为：' + journal_list_path)
-            print('正在调用WosJournalSpider进行爬取……')
-            d = crawler.crawl(WosJournalSpiderSpider, journal_list_path, output_path, document_type, output_format, self)
-
+            process.crawl(WosJournalSpiderSpider, journal_list_path=journal_list_path, output_path=output_path,
+                          document_type=document_type, output_format=output_format)
         elif self.ui.radioButtonQuery.isChecked():
             query = self.ui.textEditQuery.toPlainText()
             print('检索式为：' + query)
-            print('正在调用WosAdvancedQuerySpider进行爬取……')
-            d = crawler.crawl(WosAdvancedQuerySpiderSpider, query, output_path, document_type, output_format, self)
-
-        d.addBoth(lambda _: print('爬取完成！'))
-
-    def closeEvent(self, e):
-        print('关闭程序……')
-        try:
-            reactor.callFromThread(reactor.stop)
-        except Exception as exception:
-            pass
-        e.accept()
+            process.crawl(WosAdvancedQuerySpiderSpider, query=query, output_path=output_path,
+                          document_type=document_type, output_format=output_format)
+        self.ui.pushButtonStartCrawler.setEnabled(False)
+        process.start()
 
 
 if __name__ == '__main__':
+    app = QApplication(sys.argv)
     gui_crawler = GuiCrawler()
     gui_crawler.show()
-    reactor.run()
+    sys.exit(app.exec_())

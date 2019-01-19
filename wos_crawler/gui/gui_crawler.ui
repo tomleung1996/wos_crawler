@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>487</width>
-    <height>519</height>
+    <height>558</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>40</y>
+      <y>30</y>
       <width>99</width>
       <height>28</height>
      </rect>
@@ -37,7 +37,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>430</y>
+      <y>470</y>
       <width>99</width>
       <height>28</height>
      </rect>
@@ -46,14 +46,14 @@
      <string>开始爬取</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButtonJournalOutputPath">
+   <widget class="QPushButton" name="pushButtonOutputPath">
     <property name="enabled">
      <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>310</y>
+      <y>330</y>
       <width>99</width>
       <height>28</height>
      </rect>
@@ -68,7 +68,7 @@
       <x>20</x>
       <y>10</y>
       <width>331</width>
-      <height>396</height>
+      <height>441</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -210,6 +210,22 @@
         </layout>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="progressBarDownload">
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="textVisible">
+        <bool>true</bool>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="invertedAppearance">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>

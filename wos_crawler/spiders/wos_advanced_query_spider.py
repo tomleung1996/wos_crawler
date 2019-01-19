@@ -30,12 +30,14 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
 
     output_path_prefix = ''
 
-    def __init__(self, query = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged', *args, **kwargs):
+    def __init__(self, query = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged',gui=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.query = query
         self.output_path_prefix = output_path
         self.document_type = document_type
         self.output_format = output_format
+        self.gui = gui
+        self.downloaded = 0
 
         if query is None:
             print('请指定检索式')
@@ -203,7 +205,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
             yield FormRequest(output_url, method='POST', formdata=output_form, dont_filter=True,
                                callback=self.download_result,
                                meta={'sid': sid, 'query': query, 'qid': qid,
-                                     'start': start, 'end': end})
+                                     'start': start, 'end': end, 'paper_num':paper_num})
 
     def download_result(self, response):
 
@@ -220,6 +222,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         qid = response.meta['qid']
         start = response.meta['start']
         end = response.meta['end']
+        paper_num = response.meta['paper_num']
 
         #按日期时间保存文件
         filename = self.output_path_prefix + '/advanced_query/{}/{}.{}'.format(self.timestamp,str(start) + '-' + str(end),file_postfix)
@@ -228,3 +231,6 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
             file.write(response.text)
 
         print('--成功下载第 {} 到第 {} 条文献--'.format(start, end))
+        self.downloaded += end-start+1
+        if self.gui is not None:
+            self.gui.ui.progressBarDownload.setValue(self.downloaded/paper_num * 100)

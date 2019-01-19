@@ -30,12 +30,14 @@ class WosJournalSpiderSpider(scrapy.Spider):
     JOURNAL_LIST_PATH = None
     output_path_prefix = ''
 
-    def __init__(self, journal_list_path = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged', *args, **kwargs):
+    def __init__(self, journal_list_path = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged',gui=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.JOURNAL_LIST_PATH = journal_list_path
         self.output_path_prefix = output_path
         self.document_type = document_type
         self.output_format = output_format
+        self.gui = gui
+
 
         if journal_list_path is None:
             print('请指定期刊列表')
@@ -50,6 +52,8 @@ class WosJournalSpiderSpider(scrapy.Spider):
             for row in file:
                 self.JOURNAL_LIST.append(row.strip().replace('\n',''))
         self.JOURNAL_LIST.sort()
+        self.total_paper_num = 0
+        self.downloaded = 0
 
         for url in self.start_urls:
             yield Request(url, dont_filter=True)
@@ -179,6 +183,8 @@ class WosJournalSpiderSpider(scrapy.Spider):
         iter_num = paper_num // span + 1
 
         #对每一批次的结果进行导出（500一批）
+        print('{} 有{}条文献需要下载'.format(journal_name, paper_num))
+        self.total_paper_num += paper_num
         for i in range(1, iter_num + 1):
             end = i * span
             start = (i - 1) * span + 1
@@ -249,3 +255,7 @@ class WosJournalSpiderSpider(scrapy.Spider):
             file.write(response.text)
 
         print('--成功下载 {} 的第 {} 到第 {} 条文献--'.format(journal_name, start, end))
+
+        self.downloaded += end - start + 1
+        if self.gui is not None:
+            self.gui.ui.progressBarDownload.setValue(self.downloaded / self.total_paper_num * 100)
