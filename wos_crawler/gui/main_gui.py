@@ -18,6 +18,8 @@ from spiders.wos_journal_spider import WosJournalSpiderSpider
 # TS=INFORMATION SCIENCE AND PY=2018
 
 class GuiCrawler(QMainWindow):
+
+    # 初始化GUI及绑定signal和slot
     def __init__(self):
         super().__init__()
 
@@ -68,6 +70,7 @@ class GuiCrawler(QMainWindow):
         else:
             self.ui.pushButtonStartCrawler.setEnabled(False)
 
+    # 将全部按钮禁用
     def disable_all_ui(self):
         self.ui.pushButtonStartCrawler.setEnabled(False)
         self.ui.comboBoxOutputFormat.setEnabled(False)
@@ -109,6 +112,7 @@ class GuiCrawler(QMainWindow):
             output_format = 'tabMacUTF8'
         output_format = output_format.lower()
 
+        # 需要注意，此处使用了CrawlerRunner，以便scrapy与GUI在同一个进程中异步进行
         crawler = CrawlerRunner(get_project_settings())
         d = None
         if self.ui.radioButtonJournal.isChecked():
@@ -135,6 +139,7 @@ class GuiCrawler(QMainWindow):
 
 
 if __name__ == '__main__':
+    # 需要使用reactor来执行，而不是app.exec_()
     gui_crawler = GuiCrawler()
     gui_crawler.show()
     reactor.run()

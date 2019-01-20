@@ -155,6 +155,211 @@
              <string>Article</string>
             </property>
            </item>
+           <item>
+            <property name="text">
+             <string>Abstract of Published Item</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Art Exhibit Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Bibliography</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Biographical-Item</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Book</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Book Chapter</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Book Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Chronology</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Correction</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Correction, Addition</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Dance Performance Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Data Paper</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Database Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Discussion</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Early Access</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Editorial Material</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Excerpt</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Fiction, Creative Prose</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Film Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Hardware Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Item About an Individual</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Letter</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Meeting Abstract</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Meeting Summary</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Music Performance Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Music Score</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Music Score Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>News Item</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Note</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Poetry</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Proceedings Paper</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Record Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Reprint</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Retracted Publication</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Retraction</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Script</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Software Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>TV Review, Radio Review</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>TV Review, Radio Review Video</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Theater Review</string>
+            </property>
+           </item>
           </widget>
          </item>
         </layout>

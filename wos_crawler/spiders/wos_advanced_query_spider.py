@@ -19,6 +19,10 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
     sid_pattern = r'SID=(\w+)&'
     qid_pattern = r'qid=(\d+)&'
 
+    # 提取已购买数据库的正则表达式
+    db_pattern = r'WOS\.(\w+)'
+    db_list = []
+
     #目标文献类型
     document_type = 'Article'
 
@@ -30,7 +34,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
 
     output_path_prefix = ''
 
-    def __init__(self, query = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged',gui=None, *args, **kwargs):
+    def __init__(self, query = None, output_path = '../output', document_type='Article',output_format = 'bibtex',gui=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.query = query
         self.output_path_prefix = output_path
@@ -67,6 +71,20 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
             sid = None
             exit(-1)
 
+        # filename = 'test/landing-page-' + str(time.time()) + '-' + sid + '.html'
+        # os.makedirs(os.path.dirname(filename), exist_ok=True)
+        # with open(filename, 'w', encoding='utf-8') as file:
+        #     file.write(response.text)
+
+        # 获取已购买的WOS核心数据库信息
+        soup = BeautifulSoup(response.text, 'lxml')
+        db_str = str(soup.find('select', attrs={'id': 'ss_showsuggestions'}).get('onchange'))
+        pattern = re.compile(self.db_pattern)
+        result = pattern.findall(db_str)
+        if result is not None:
+            print('已购买的数据库为：',result)
+            self.db_list = result
+
         # 提交post高级搜索请求
         adv_search_url = 'http://apps.webofknowledge.com/WOS_AdvancedSearch.do'
         #检索式，目前设定为期刊，稍作修改可以爬取任意检索式
@@ -95,8 +113,9 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
             "period": "Range Selection",
             "range": "ALL",
             "startYear": "1900",
-            "endYear": "2018",
-            "editions": ["SCI", "SSCI", "AHCI", "ISTP", "ISSHP", "ESCI", "CCR", "IC"],
+            "endYear": time.strftime('%Y'),
+            "editions": self.db_list,
+            # "editions": ["SCI", "SSCI", "AHCI", "ISTP", "ISSHP", "ESCI", "CCR", "IC"],
             "update_back2search_link_param": "yes",
             "ss_query_language": "",
             "rs_sort_by": "PY.D;LD.D;SO.A;VL.D;PG.A;AU.A",
