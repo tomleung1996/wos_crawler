@@ -11,9 +11,10 @@ class WosDocument(Base):
     title = Column(String)
     abs = Column(Text)
     journal = Column(String)
+    journal_iso = Column(String)
     publisher = Column(String)
     volume = Column(Integer)
-    # issue = Column(Integer)
+    issue = Column(String) # 因为可能有SI：Special Issue，所以是String
     pub_year = Column(Integer)
     pub_month_day = Column(String)
     document_type = Column(String)
@@ -34,17 +35,18 @@ class WosDocument(Base):
     references = relationship('WosReference', back_populates='document')
     fundings = relationship('WosFunding', back_populates='document')
 
-    def __init__(self, unique_id, title, abs, journal, publisher,
-                 volume, pub_year, pub_month_day, document_type,
+    def __init__(self, unique_id, title, abs, journal, journal_iso, publisher,
+                 volume, issue, pub_year, pub_month_day, document_type,
                  doi, cited_times, reference_num, usage_180, usage_since_2013,
-                 funding, funding_text, language, author_email):
+                 funding_text, language, author_email):
         self.unique_id = unique_id
         self.title = title
         self.abs = abs
         self.journal = journal
+        self.journal_iso = journal_iso
         self.publisher = publisher
         self.volume = volume
-        # self.issue = issue
+        self.issue = issue
         self.pub_year = pub_year
         self.pub_month_day = pub_month_day
         self.document_type = document_type
@@ -53,7 +55,7 @@ class WosDocument(Base):
         self.reference_num = reference_num
         self.usage_180 = usage_180
         self.usage_since_2013 = usage_since_2013
-        self.funding = funding
+        # self.funding = funding
         self.funding_text = funding_text
         self.language = language
         self.author_email = author_email

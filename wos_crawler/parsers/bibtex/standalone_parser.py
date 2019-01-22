@@ -12,11 +12,12 @@ def customizations(document):
     document = keyword(document)
     document = keyword_plus(document)
     document = reference(document)
+    document = funding(document)
     return document
 
 
 def run():
-    bibtex_filename = r'C:\Users\Tom\PycharmProjects\wos_crawler\input\1501-2000.bib'
+    bibtex_filename = r'C:\Users\Tom\PycharmProjects\wos_crawler\input\1-500.bib'
 
     with open(bibtex_filename, 'r', encoding='utf-8') as file:
         parser = BibTexParser()
@@ -32,20 +33,25 @@ def run():
         keyword_list = []
         keyword_plus_list = []
         reference_list = []
+        funding_list = []
 
         # 解析文章基本信息 wos_document表的信息
-        wos_document = WosDocument(bib_db.entries[i]['unique-id'][1:-1].lower()
+        wos_document = WosDocument(bib_db.entries[i]['unique-id'][5:-1].lower()
                                    if 'unique-id' in bib_db.entries[i] else None,
-                                   bib_db.entries[i]['title'][1:-1].lower().replace('\\', '')
+                                   bib_db.entries[i]['title'][1:-1].lower().replace('\n', ' ').replace('\\', '')
                                    if 'title' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['abstract'][1:-1].lower().replace('\n', ' ').replace('\\', '')
                                    if 'abstract' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['journal'][1:-1].lower().replace('\\', '')
                                    if 'journal' in bib_db.entries[i] else None,
+                                   bib_db.entries[i]['journal-iso'][1:-1].lower().replace('\\', '')
+                                   if 'journal-iso' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['publisher'][1:-1].lower().replace('\\', '')
                                    if 'publisher' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['volume'][1:-1].lower()
                                    if 'volume' in bib_db.entries[i] else None,
+                                   bib_db.entries[i]['number'][1:-1].lower()
+                                   if 'number' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['year'][1:-1].lower()
                                    if 'year' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['month'][1:-1].lower()
@@ -62,10 +68,6 @@ def run():
                                    if 'usage-count-last-180-days' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['usage-count-since-2013'][1:-1].lower()
                                    if 'usage-count-since-2013' in bib_db.entries[i] else None,
-                                   bib_db.entries[i]['funding-acknowledgement'][1:-1].lower().replace('\n',
-                                                                                                      ' ').replace('\\',
-                                                                                                                   '')
-                                   if 'funding-acknowledgement' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['funding-text'][1:-1].lower().replace('\n', ' ').replace('\\', '')
                                    if 'funding-text' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['language'][1:-1].lower()
@@ -94,7 +96,6 @@ def run():
             author_list.append(author)
         wos_document.authors = author_list
 
-
         # 解析WoS分类信息
         for category in bib_db.entries[i]['web-of-science-categories']:
             cat = WosCategory(category)
@@ -112,6 +113,19 @@ def run():
             kp = WosKeywordPlus(keyword_plus)
             keyword_plus_list.append(kp)
         wos_document.keyword_plus = keyword_plus_list
+
+        # 解析基金信息
+        for agent, numbers in bib_db.entries[i]['funding-acknowledgement'].items():
+            for number in numbers:
+                fund = WosFunding(agent, number)
+                funding_list.append(fund)
+        wos_document.fundings = funding_list
+
+        # 解析参考文献信息
+        for reference in bib_db.entries[i]['cited-references']:
+            ref = WosReference(reference[0], reference[1], reference[2], reference[3], reference[4], reference[5])
+            reference_list.append(ref)
+        wos_document.references = reference_list
 
         session.add(wos_document)
     session.commit()

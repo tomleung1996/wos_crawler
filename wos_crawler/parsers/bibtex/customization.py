@@ -1,3 +1,5 @@
+import re
+
 def author(document):
     if 'author' in document:
         if document['author']:
@@ -168,20 +170,20 @@ def author(document):
 
 
 def author_affiliation_v2(document):
-    # select a.author_order, a.last_name, a.first_name, a.is_reprint_author, b.address from wos_author as a
-    #     left join wos_affiliation as b on a.author_id = b.author_id order by a.author_order
+    # select a.document_unique_id, a.author_order, a.last_name, a.first_name, a.is_reprint_author, b.address from wos_author as a
+    #          left join wos_affiliation as b on a.author_id = b.author_id order by a.document_unique_id,a.author_order
     # 调用本函数之前请先调用author函数
     if 'affiliation' in document:
         if document['affiliation']:
             ordered_author_list = document['author']
             assert type(ordered_author_list) == type([])
 
-            #首先处理名字中有逗号的情况（即除了分割姓名的逗号以外，还有第第二个逗号，此时需要交换第二、三部分的位置）
+            # 首先处理名字中有逗号的情况（即除了分割姓名的逗号以外，还有第第二个逗号，此时需要交换第二、三部分的位置）
             for i_author in range(len(ordered_author_list)):
                 name_split = ordered_author_list[i_author].split(', ')
                 if len(name_split) == 3:
                     ordered_author_list[i_author] = '{}, {}, {}'.format(name_split[0], name_split[2], name_split[1])
-                #如果遇到其他情况，则报错，保证完备性
+                # 如果遇到其他情况，则报错，保证完备性
                 elif len(name_split) > 3:
                     print(name_split)
                     print('未考虑的情况：name_split长度大于3')
@@ -207,7 +209,7 @@ def author_affiliation_v2(document):
 
                 if 'reprint author' in bak_affiliation:
                     reprint_author_line = 1
-                    bak_affiliation = bak_affiliation.replace(' (reprint author)','')
+                    bak_affiliation = bak_affiliation.replace(' (reprint author)', '')
 
                     for author_name in ordered_author_list:
                         # 将正常的全称处理为reprint作者的表示格式
@@ -231,10 +233,8 @@ def author_affiliation_v2(document):
                             # 对于只有姓没有名的就直接保留
                             reprint_name = author_name
                         else:
-                            print('出现未考虑到的情况：',author_name)
+                            print('出现未考虑到的情况：', author_name)
                             exit(-1)
-
-
 
                         if reprint_name in bak_affiliation:
                             author_in_this_line.append(author_name)
@@ -249,7 +249,7 @@ def author_affiliation_v2(document):
                             bak_affiliation = bak_affiliation.replace(author_name, '')
 
                 # 将作者从机构字段中提取并删除后，处理地址
-                pos = bak_affiliation.index(',')+2
+                pos = bak_affiliation.index(',') + 2
                 address = bak_affiliation[pos:]
 
                 # 将结果写入result
@@ -261,7 +261,8 @@ def author_affiliation_v2(document):
                             last_name, first_name = author_inline.split(' ')
                         except:
                             try:
-                                last_name, first_name = author_inline.split(', ')[0], ', '.join(author_inline.split(', ')[1:])
+                                last_name, first_name = author_inline.split(', ')[0], ', '.join(
+                                    author_inline.split(', ')[1:])
                             except:
                                 last_name, first_name = author_inline, None
 
@@ -338,11 +339,83 @@ def keyword_plus(document):
 def reference(document):
     if 'cited-references' in document:
         if document['cited-references']:
-            document['cited-references'] = document['cited-references'][1:-1].lower().replace('\\', '').split('\n')
+            volume_pattern = re.compile(r'v\d+')
+            page_pattern = re.compile(r'p\d+')
+            doi_pattern = re.compile(r'doi .+')
+
+
+            result = []
+            references = document['cited-references'][1:-1].lower().replace('{[}', '[').replace('\\', '').split('\n')
+
+            for reference in references:
+                ref_split = reference[:-1].split(', ')
+
+                first_author = ref_split[0]
+                pub_year = ref_split[1]
+                journal = None
+                volume = None
+                start_page = None
+                doi = None
+
+                min_i = 999
+                for i_part in range(2, len(ref_split)):
+                    volume_match = volume_pattern.match(ref_split[i_part])
+                    page_match = page_pattern.match(ref_split[i_part])
+                    doi_match = doi_pattern.match(ref_split[i_part])
+
+                    if volume_match:
+                        volume = ref_split[i_part][1:]
+                        if i_part < min_i:
+                            min_i = i_part
+                    elif page_match:
+                        start_page = ref_split[i_part][1:]
+                        if i_part < min_i:
+                            min_i = i_part
+                    elif doi_match:
+                        doi = ref_split[i_part].replace('doi ','').replace('[','').replace(']','')
+                        if i_part < min_i:
+                            min_i = i_part
+
+                if min_i > 2:
+                    journal = ', '.join(ref_split[2:min_i])
+
+                result.append((first_author, pub_year, journal, volume, start_page, doi))
+
+            document['cited-references'] = result
         else:
-            document['cited-references'] = [None]
+            document['cited-references'] = [(None,None,None,None,None,None)]
     else:
-        document['cited-references'] = [None]
+        document['cited-references'] = [(None,None,None,None,None,None)]
+    return document
+
+
+def funding(document):
+    if 'funding-acknowledgement' in document:
+        if document['funding-acknowledgement']:
+            result = {}
+            fundings = document['funding-acknowledgement'][1:-1].lower().replace('\\', '').replace('\n', ' ') \
+                .replace('{[}', '[').split('; ')
+
+            for fund in fundings:
+                tmp = fund.split(' [')
+                if len(tmp) == 2:
+                    agent, numbers = tmp[0], tmp[1]
+                    numbers = numbers.replace(']', '').split(', ')
+                elif len(tmp) == 1:
+                    agent, numbers = tmp[0], [None]
+                elif len(tmp) == 3:
+                    agent, numbers = tmp[0] + ' [' + tmp[1], tmp[2]
+                    numbers = numbers.replace(']', '').split(', ')
+                else:
+                    print('未考虑到的情况：', tmp)
+                    exit(-1)
+
+                result[agent] = numbers
+            document['funding-acknowledgement'] = result
+        else:
+            document['funding-acknowledgement'] = {None: [None]}
+    else:
+        document['funding-acknowledgement'] = {None: [None]}
     return document
 
 
