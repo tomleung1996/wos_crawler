@@ -27,7 +27,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
     document_type = 'Article'
 
     #导出文献格式
-    output_format = 'fieldtagged'
+    output_format = 'bibtex'
 
     #在这里输入检索式
     query = None
@@ -246,8 +246,14 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         #按日期时间保存文件
         filename = self.output_path_prefix + '/advanced_query/{}/{}.{}'.format(self.timestamp,str(start) + '-' + str(end),file_postfix)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
+        text = response.text
+
+        # WoS的bibtex格式不规范，需要特别处理一下
+        if self.output_format == 'bibtex':
+            text = text.replace('Early Access Date', 'Early-Access-Date').replace('Early Access Year', 'Early-Access-Year')
+
         with open(filename, 'w', encoding='utf-8') as file:
-            file.write(response.text)
+            file.write(text)
 
         print('--成功下载第 {} 到第 {} 条文献--'.format(start, end))
         self.downloaded += end-start+1
