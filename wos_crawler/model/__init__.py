@@ -5,11 +5,16 @@ import time
 
 Base = declarative_base()
 
-timestamp = str(time.strftime('%Y-%m-%d-%H.%M.%S',time.localtime(time.time())))
-engine = create_engine('sqlite:///wos_crawler_result_{}.db'.format(timestamp))
+def get_engine(db_path=None):
+    if not db_path:
+        timestamp = str(time.strftime('%Y-%m-%d-%H.%M.%S',time.localtime(time.time())))
+        engine = create_engine('sqlite:///wos_crawler_result_{}.db'.format(timestamp))
+    else:
+        engine = create_engine('sqlite:///{}'.format(db_path))
+    return engine
 
 
-def loadSession():
+def loadSession(engine):
     Session = sessionmaker(bind=engine)
     session = Session()
     return session

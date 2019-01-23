@@ -30,6 +30,7 @@ class WosDocument(Base):
 
     authors = relationship('WosAuthor', back_populates='document')
     categories = relationship('WosCategory', back_populates='document')
+    research_areas = relationship('WosResearchArea', back_populates='document')
     keywords = relationship('WosKeyword', back_populates='document')
     keyword_plus = relationship('WosKeywordPlus', back_populates='document')
     references = relationship('WosReference', back_populates='document')
@@ -103,6 +104,22 @@ class WosCategory(Base):
 
     def __repr__(self):
         return '文章{}的类别：{}'.format(self.document_unique_id, self.category)
+
+class WosResearchArea(Base):
+    __tablename__ = 'wos_research_area'
+
+    category_id = Column(Integer, primary_key=True, autoincrement=True)
+
+    document_unique_id = Column(String, ForeignKey('wos_document.unique_id'))
+    document = relationship('WosDocument', back_populates='research_areas')
+
+    area = Column(String)
+
+    def __init__(self, area):
+        self.area = area
+
+    def __repr__(self):
+        return '文章{}的研究领域：{}'.format(self.document_unique_id, self.area)
 
 
 class WosKeyword(Base):

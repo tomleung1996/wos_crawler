@@ -7,8 +7,9 @@ import time
 from bs4 import BeautifulSoup
 import os
 import sys
+from items import WosBibtexItem
 
-
+# wos导出的时候有些批次可能会比500条少一两条，不是本程序的BUG
 class WosAdvancedQuerySpiderSpider(scrapy.Spider):
     name = 'wos_advanced_query_spider'
     allowed_domains = ['webofknowledge.com']
@@ -256,6 +257,15 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
             file.write(text)
 
         print('--成功下载第 {} 到第 {} 条文献--'.format(start, end))
+
+        # 解析并导入数据库
+        if self.output_format == 'bibtex':
+            item = WosBibtexItem()
+            item['filename'] = filename
+            item['output_path'] = '/'.join(filename.split('/')[:-1]) + '/result.db'
+            yield item
+
+
         self.downloaded += end-start+1
         if self.gui is not None:
             self.gui.ui.progressBarDownload.setValue(self.downloaded/paper_num * 100)

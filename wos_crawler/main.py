@@ -29,8 +29,8 @@ if __name__ == '__main__':
     #                  output_path='../output', output_format='bibtex', document_type='article')
 
     # 按检索式下载
-    # crawl_by_query(query='TS=information science AND PY=2018',
-    #                output_path='../output', output_format='bibtex', document_type='article')
+    # crawl_by_query(query='TS=information science AND PY=2017',
+    #                output_path='../output', output_format='bibtex', document_type='')
 
     # 使用GUI下载
     # crawl_by_gui()

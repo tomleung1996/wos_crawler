@@ -312,6 +312,16 @@ def wos_category(document):
         document['web-of-science-categories'] = [None]
     return document
 
+def research_area(document):
+    if 'research-areas' in document:
+        if document['research-areas']:
+            document['research-areas'] = document['research-areas'][1:-1] \
+                .lower().replace('\n', '').replace('\\', '').split('; ')
+        else:
+            document['research-areas'] = [None]
+    else:
+        document['research-areas'] = [None]
+    return document
 
 def keyword(document):
     if 'keywords' in document:

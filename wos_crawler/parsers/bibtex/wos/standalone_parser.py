@@ -1,14 +1,16 @@
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
-from parsers.bibtex.customization import *
-from model import Base, engine, loadSession
+from parsers.bibtex.wos.customization import *
+from model import get_engine, loadSession
 from model.wos_document import *
+import os
 
 
 def customizations(document):
     document = author(document)
     document = author_affiliation_v2(document)
     document = wos_category(document)
+    document = research_area(document)
     document = keyword(document)
     document = keyword_plus(document)
     document = reference(document)
@@ -16,20 +18,29 @@ def customizations(document):
     return document
 
 
-def run():
-    bibtex_filename = r'C:\Users\Tom\PycharmProjects\wos_crawler\input\1-500.bib'
+def parse_single(input_file=None, db_path=None):
+    assert input_file is not None and db_path is not None
+
+    print('正在解析{}……'.format(input_file))
+
+    bibtex_filename = input_file
 
     with open(bibtex_filename, 'r', encoding='utf-8') as file:
         parser = BibTexParser()
         parser.customization = customizations
         bib_db = bibtexparser.load(file, parser=parser)
 
+    # if len(bib_db.entries) != 500:
+    #     exit(-1)
+
+    engine = get_engine(db_path)
     Base.metadata.create_all(engine)
-    session = loadSession()
+    session = loadSession(engine)
 
     for i in range(len(bib_db.entries)):
         author_list = []
         category_list = []
+        area_list = []
         keyword_list = []
         keyword_plus_list = []
         reference_list = []
@@ -102,6 +113,12 @@ def run():
             category_list.append(cat)
         wos_document.categories = category_list
 
+        # 解析研究领域信息
+        for area in bib_db.entries[i]['research-areas']:
+            a = WosResearchArea(area)
+            area_list.append(a)
+        wos_document.research_areas = area_list
+
         # 解析作者关键词
         for keyword in bib_db.entries[i]['keywords']:
             key = WosKeyword(keyword)
@@ -131,6 +148,17 @@ def run():
     session.commit()
     session.close()
 
+    print('解析{}完成'.format(input_file))
+
+def parse(input_dir=None, db_path=None):
+    assert input_dir is not None and db_path is not None
+
+    for root, dirs, files in os.walk(input_dir):
+        for file in files:
+            if file[-4:] == '.bib':
+                parse_single(os.path.join(root,file), db_path)
+
+    print('全部解析完成')
 
 if __name__ == '__main__':
-    run()
+    parse('C:/Users/Tom/PycharmProjects/wos_crawler/output/advanced_query/2019-01-20-16.35.46','C:/Users/Tom/Desktop/test.db')
