@@ -54,7 +54,9 @@ def parse_single(input_file=None, db_path=None):
                                    bib_db.entries[i]['abstract'][1:-1].lower().replace('\n', ' ').replace('\\', '')
                                    if 'abstract' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['journal'][1:-1].lower().replace('\\', '')
-                                   if 'journal' in bib_db.entries[i] else None,
+                                   if 'journal' in bib_db.entries[i] else
+                                   bib_db.entries[i]['booktitle'][1:-1].lower().replace('\n', ' ').replace('\\', '')
+                                   if 'booktitle' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['journal-iso'][1:-1].lower().replace('\\', '')
                                    if 'journal-iso' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['publisher'][1:-1].lower().replace('\\', '')
@@ -161,4 +163,4 @@ def parse(input_dir=None, db_path=None):
     print('全部解析完成')
 
 if __name__ == '__main__':
-    parse('C:/Users/Tom/PycharmProjects/wos_crawler/output/advanced_query/2019-01-20-16.35.46','C:/Users/Tom/Desktop/test.db')
+    parse('C:/Users/Tom/PycharmProjects/wos_crawler/output/advanced_query/2019-01-23-23.41.04','C:/Users/Tom/Desktop/test.db')
