@@ -12,6 +12,7 @@ A crawler that downloads bibliographic data from Web of Science, given:
 - PS: (Due to restrictions of Web of Science, users can only export the first 100K records, so if your query returns more than 100K results, please add a time constraint on it to split your query into serval parts. eg: add "PY=(year1-year2)")
 
 ## 使用方法 / Usage
+具体爬取逻辑和使用方法可以查看[我的CSDN博客](https://blog.csdn.net/tomleung1996/article/details/86627443)
 
 使用图形界面 / Using GUI
 
