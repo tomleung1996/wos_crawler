@@ -7,12 +7,14 @@ import time
 from bs4 import BeautifulSoup
 import os
 import sys
+from items import WosBibtexItem
 
 
 class WosJournalSpiderSpider(scrapy.Spider):
     name = 'wos_journal_spider'
     allowed_domains = ['webofknowledge.com']
     start_urls = ['http://www.webofknowledge.com/']
+    timestamp = str(time.strftime('%Y-%m-%d-%H.%M.%S',time.localtime(time.time())))
 
     #提取URL中的SID和QID所需要的正则表达式
     sid_pattern = r'SID=(\w+)&'
@@ -276,6 +278,13 @@ class WosJournalSpiderSpider(scrapy.Spider):
             file.write(text)
 
         print('--成功下载 {} 的第 {} 到第 {} 条文献--'.format(journal_name, start, end))
+
+        # 解析并导入数据库
+        if self.output_format == 'bibtex':
+            item = WosBibtexItem()
+            item['filename'] = filename
+            item['output_path'] = '/'.join(filename.split('/')[:-2]) + '/{}-result.db'.format(self.timestamp)
+            yield item
 
         self.downloaded += end - start + 1
         if self.gui is not None:
