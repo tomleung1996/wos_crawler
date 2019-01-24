@@ -1,8 +1,8 @@
 # Web of Science 爬虫 / Web of Science Crawler
-一个导出Web of Science题录数据的爬虫，支持以下两种方式：
+一个导出Web of Science题录数据，解析并存入数据库的爬虫，支持以下两种方式：
 
-- 给定所需的期刊名称列表，下载列表中所有期刊上的Article类型的文献
-- 给定合法的WoS高级检索式，下载检索式得到的Article类型的结果
+- 给定所需的期刊名称列表，下载列表中所有期刊上的的文献
+- 给定合法的WoS高级检索式，下载检索式得到的结果
 - PS:（因为WoS本身的限制，单个检索式超过10万个结果的话，10万条后面的结果无法导出，请通过年份限定的方式修改检索式进行分别爬取）
 
 A crawler that downloads bibliographic data from Web of Science, given:

@@ -3,14 +3,14 @@ import settings
 from scrapy import cmdline
 
 
-def crawl_by_journal(journal_list_path, output_path='../output', document_type='Article', output_format='fieldtagged'):
+def crawl_by_journal(journal_list_path, output_path='../output', document_type='Article', output_format='bibtex'):
     cmdline.execute(
         r'scrapy crawl wos_journal_spider -a journal_list_path={} -a output_path={} -a output_format={}'.format(
             journal_list_path, output_path, output_format).split() + ['-a', 'document_type={}'.format(
             document_type)])
 
 
-def crawl_by_query(query, output_path='../output', document_type='Article', output_format='fieldtagged'):
+def crawl_by_query(query, output_path='../output', document_type='Article', output_format='bibtex'):
     cmdline.execute(
         r'scrapy crawl wos_advanced_query_spider -a output_path={} -a output_format={}'.format(
             output_path, output_format).split() +
