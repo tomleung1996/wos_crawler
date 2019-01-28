@@ -1,5 +1,6 @@
 import re
 
+
 def author(document):
     if 'author' in document:
         if document['author']:
@@ -312,6 +313,7 @@ def wos_category(document):
         document['web-of-science-categories'] = [None]
     return document
 
+
 def research_area(document):
     if 'research-areas' in document:
         if document['research-areas']:
@@ -322,6 +324,7 @@ def research_area(document):
     else:
         document['research-areas'] = [None]
     return document
+
 
 def keyword(document):
     if 'keywords' in document:
@@ -353,7 +356,6 @@ def reference(document):
             page_pattern = re.compile(r'p\d+')
             doi_pattern = re.compile(r'doi .+')
 
-
             result = []
             references = document['cited-references'][1:-1].lower().replace('{[}', '[').replace('\\', '').split('\n')
 
@@ -382,7 +384,7 @@ def reference(document):
                         if i_part < min_i:
                             min_i = i_part
                     elif doi_match:
-                        doi = ref_split[i_part].replace('doi ','').replace('[','').replace(']','')
+                        doi = ref_split[i_part].replace('doi ', '').replace('[', '').replace(']', '')
                         if i_part < min_i:
                             min_i = i_part
 
@@ -393,9 +395,9 @@ def reference(document):
 
             document['cited-references'] = result
         else:
-            document['cited-references'] = [(None,None,None,None,None,None)]
+            document['cited-references'] = [(None, None, None, None, None, None)]
     else:
-        document['cited-references'] = [(None,None,None,None,None,None)]
+        document['cited-references'] = [(None, None, None, None, None, None)]
     return document
 
 
@@ -407,18 +409,27 @@ def funding(document):
                 .replace('{[}', '[').split('; ')
 
             for fund in fundings:
-                tmp = fund.split(' [')
-                if len(tmp) == 2:
-                    agent, numbers = tmp[0], tmp[1]
-                    numbers = numbers.replace(']', '').split(', ')
-                elif len(tmp) == 1:
-                    agent, numbers = tmp[0], [None]
-                elif len(tmp) == 3:
-                    agent, numbers = tmp[0] + ' [' + tmp[1], tmp[2]
-                    numbers = numbers.replace(']', '').split(', ')
+                pos = find_nth(fund, '[', -1)
+                if pos != -1:
+                    tmp = [fund[:pos], fund[pos:]]
+                    agent = tmp[0]
+                    numbers = tmp[1].replace('[', '').replace(']', '').split(', ')
                 else:
-                    print('未考虑到的情况：', tmp)
-                    exit(-1)
+                    agent = fund
+                    numbers = [None]
+
+                # tmp = fund.split(' [')
+                # if len(tmp) == 2:
+                #     agent, numbers = tmp[0], tmp[1]
+                #     numbers = numbers.replace(']', '').split(', ')
+                # elif len(tmp) == 1:
+                #     agent, numbers = tmp[0], [None]
+                # elif len(tmp) == 3:
+                #     agent, numbers = tmp[0] + ' [' + tmp[1], tmp[2]
+                #     numbers = numbers.replace(']', '').split(', ')
+                # else:
+                #     print('未考虑到的情况：', tmp)
+                #     exit(-1)
 
                 result[agent] = numbers
             document['funding-acknowledgement'] = result
@@ -438,4 +449,4 @@ def find_nth(haystack, needle, n):
 
 
 if __name__ == '__main__':
-    print(find_nth('abcabc', 'a', 1))
+    print(find_nth('abcabcacb', 'd', -1))

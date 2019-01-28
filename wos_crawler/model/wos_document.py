@@ -86,7 +86,7 @@ class WosAuthor(Base):
         self.is_reprint_author = is_reprint_author
 
     def __repr__(self):
-        return '文章{}的作者：{}, {}'.format(self.document_unique_id, self.first_name, self.last_name)
+        return '文章{}的作者：{}, {}'.format(self.document_unique_id, self.last_name, self.first_name)
 
 
 class WosCategory(Base):

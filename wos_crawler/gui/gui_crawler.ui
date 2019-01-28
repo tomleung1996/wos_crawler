@@ -67,7 +67,7 @@
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>331</width>
+      <width>335</width>
       <height>441</height>
      </rect>
     </property>
@@ -377,12 +377,12 @@
           <widget class="QComboBox" name="comboBoxOutputFormat">
            <item>
             <property name="text">
-             <string>Plain Text</string>
+             <string>Bibtex</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Bibtex</string>
+             <string>Plain Text</string>
             </property>
            </item>
            <item>

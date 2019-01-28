@@ -46,6 +46,10 @@ The output format can be WoS Plain Text/Bibtex/HTML/Tab-delimited file, the same
 - If you run the crawler in the journal list mode, each journal will have its own folder
 - If you run the crawler in the advanced query mode, the result folder will be named by current time.
 
+## 已知BUG / Known Bug
+
+- 如果文献中存在`{`与`}`的不正确使用（不配对），则会存在截断问题，由于依赖了bibtexparser，目前我也没有很好的办法修复
+
 ## 后续工作 / TODO
 
 - 集成文献数据解析和存入数据库功能 / Add data parsing and storage support

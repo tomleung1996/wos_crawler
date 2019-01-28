@@ -14,7 +14,7 @@ def get_engine(db_path=None):
     return engine
 
 
-def loadSession(engine):
-    Session = sessionmaker(bind=engine)
+def get_session(engine, auto_flush = True):
+    Session = sessionmaker(bind=engine, autoflush=auto_flush)
     session = Session()
     return session

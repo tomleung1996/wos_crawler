@@ -1,7 +1,7 @@
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
 from parsers.bibtex.wos.customization import *
-from model import get_engine, loadSession
+from model import get_engine, get_session
 from model.wos_document import *
 import os
 
@@ -30,12 +30,17 @@ def parse_single(input_file=None, db_path=None):
         parser.customization = customizations
         bib_db = bibtexparser.load(file, parser=parser)
 
+    # for k,v in bib_db.entries[0].items():
+    #     print(k,v)
+    #     print('======\n')
+    # exit(0)
+
     # if len(bib_db.entries) != 500:
     #     exit(-1)
 
     engine = get_engine(db_path)
     Base.metadata.create_all(engine)
-    session = loadSession(engine)
+    session = get_session(engine)
 
     for i in range(len(bib_db.entries)):
         author_list = []
@@ -87,6 +92,11 @@ def parse_single(input_file=None, db_path=None):
                                    if 'language' in bib_db.entries[i] else None,
                                    bib_db.entries[i]['author-email'][1:-1].lower().replace('\n', ';').replace('\\', '')
                                    if 'author-email' in bib_db.entries[i] else None)
+
+        # TODO: 暂时把格式错误的文章删去
+        if wos_document.unique_id is None:
+            print('{} 文件存在格式不正确的记录，已跳过该记录'.format(input_file))
+            continue
 
         # 解析作者及机构的信息
         for author_info, addresses in bib_db.entries[i]['affiliation'].items():
@@ -147,10 +157,14 @@ def parse_single(input_file=None, db_path=None):
         wos_document.references = reference_list
 
         session.add(wos_document)
+
+    print('解析{}完成，正在插入……\n'.format(input_file))
+
     session.commit()
     session.close()
 
-    print('解析{}完成'.format(input_file))
+    print('插入{}完成\n'.format(input_file))
+
 
 def parse(input_dir=None, db_path=None):
     assert input_dir is not None and db_path is not None
@@ -158,9 +172,11 @@ def parse(input_dir=None, db_path=None):
     for root, dirs, files in os.walk(input_dir):
         for file in files:
             if file[-4:] == '.bib':
-                parse_single(os.path.join(root,file), db_path)
+                parse_single(os.path.join(root, file), db_path)
 
     print('全部解析完成')
 
+
 if __name__ == '__main__':
-    parse('C:/Users/Tom/PycharmProjects/wos_crawler/output/advanced_query/2019-01-23-23.41.04','C:/Users/Tom/Desktop/test.db')
+    parse(r'C:\Users\Tom\PycharmProjects\wos_crawler\input\test',
+          'C:/Users/Tom/Desktop/test.db')

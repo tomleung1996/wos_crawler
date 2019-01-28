@@ -7,8 +7,7 @@ import time
 from bs4 import BeautifulSoup
 import os
 import sys
-from items import WosBibtexItem
-
+from parsers.bibtex.wos.standalone_parser import parse
 
 class WosJournalSpiderSpider(scrapy.Spider):
     name = 'wos_journal_spider'
@@ -280,12 +279,19 @@ class WosJournalSpiderSpider(scrapy.Spider):
         print('--成功下载 {} 的第 {} 到第 {} 条文献--'.format(journal_name, start, end))
 
         # 解析并导入数据库
-        if self.output_format == 'bibtex':
-            item = WosBibtexItem()
-            item['filename'] = filename
-            item['output_path'] = '/'.join(filename.split('/')[:-2]) + '/{}-result.db'.format(self.timestamp)
-            yield item
+        # if self.output_format == 'bibtex':
+        #     item = WosBibtexItem()
+        #     item['filename'] = filename
+        #     item['output_path'] = '/'.join(filename.split('/')[:-2]) + '/{}-result.db'.format(self.timestamp)
+        #     yield item
 
         self.downloaded += end - start + 1
         if self.gui is not None:
             self.gui.ui.progressBarDownload.setValue(self.downloaded / self.total_paper_num * 100)
+
+    def close(spider, reason):
+        # 解析并导入数据库
+        if spider.output_format == 'bibtex':
+            print('爬取完成，开始导入数据库')
+            parse(input_dir=spider.output_path_prefix + '/journal',
+                  db_path=spider.output_path_prefix + '/journal/{}-result.db'.format(spider.timestamp))
