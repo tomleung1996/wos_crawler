@@ -7,6 +7,7 @@
 - 支持多种爬取结果的保存格式，如Plain text、Bibtex、HTML等，**推荐使用Plain text，解析速度最快**
 - 支持将爬取结果**解析、导入**数据库（目前仅Plain text、Bibtex格式支持解析、导入），解析数据项除了基本的文献信息外（标题、摘要、关键词、被引量等），还包括作者机构、基金、分类、参考文献等信息
 
+程序主要依赖：Scrapy、BeautifulSoup、PyQt5、SQLAlchemy、[bibtexparser](https://github.com/sciunto-org/python-bibtexparser)、[qt5reactor](https://github.com/sunu/qt5reactor)、networkX
 ## 使用方法 
 具体爬取逻辑和使用方法可以查看[我的CSDN博客](https://blog.csdn.net/tomleung1996/article/details/86627443)
 
