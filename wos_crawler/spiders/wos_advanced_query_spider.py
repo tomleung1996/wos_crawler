@@ -7,7 +7,9 @@ import time
 from bs4 import BeautifulSoup
 import os
 import sys
-from parsers.bibtex.wos.standalone_parser import parse
+from parsers.bibtex.wos import bibtex_parser
+from parsers.plaintext.wos import plaintex_parser
+
 
 # wos导出的时候有些批次可能会比500条少一两条，不是本程序的BUG
 class WosAdvancedQuerySpiderSpider(scrapy.Spider):
@@ -273,7 +275,12 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
     def close(spider, reason):
         # 等到全部爬取完成后再解析并导入数据库
         if spider.output_format == 'bibtex':
-            print('爬取完成，开始导入数据库')
-            parse(input_dir=spider.output_path_prefix + '/advanced_query/{}'.format(spider.timestamp),
+            print('爬取完成，开始导入数据库(bibtex)')
+            bibtex_parser.parse(input_dir=spider.output_path_prefix + '/advanced_query/{}'.format(spider.timestamp),
                   db_path=spider.output_path_prefix + '/advanced_query/{}/result.db'.format(spider.timestamp))
+        elif spider.output_format == 'fieldtagged':
+            print('爬取完成，开始导入数据库(fieldtagged/plaintext)')
+            plaintex_parser.parse(input_dir=spider.output_path_prefix + '/advanced_query/{}'.format(spider.timestamp),
+                  db_path=spider.output_path_prefix + '/advanced_query/{}/result.db'.format(spider.timestamp))
+
 

@@ -7,7 +7,9 @@ import time
 from bs4 import BeautifulSoup
 import os
 import sys
-from parsers.bibtex.wos.standalone_parser import parse
+from parsers.bibtex.wos import bibtex_parser
+from parsers.plaintext.wos import plaintex_parser
+
 
 class WosJournalSpiderSpider(scrapy.Spider):
     name = 'wos_journal_spider'
@@ -27,7 +29,7 @@ class WosJournalSpiderSpider(scrapy.Spider):
     document_type = 'Article'
 
     # 导出文献格式
-    output_format = 'fieldtagged'
+    output_format = 'bibtex'
 
     #待爬取期刊列表和列表存放的位置
     JOURNAL_LIST = []
@@ -290,8 +292,15 @@ class WosJournalSpiderSpider(scrapy.Spider):
             self.gui.ui.progressBarDownload.setValue(self.downloaded / self.total_paper_num * 100)
 
     def close(spider, reason):
-        # 解析并导入数据库
+        # 等到全部爬取完成后再解析并导入数据库
         if spider.output_format == 'bibtex':
-            print('爬取完成，开始导入数据库')
-            parse(input_dir=spider.output_path_prefix + '/journal',
-                  db_path=spider.output_path_prefix + '/journal/{}-result.db'.format(spider.timestamp))
+            print('爬取完成，开始导入数据库(bibtex)')
+            bibtex_parser.parse(input_dir=spider.output_path_prefix + '/advanced_query/{}'.format(spider.timestamp),
+                                db_path=spider.output_path_prefix + '/advanced_query/{}/result.db'.format(
+                                    spider.timestamp))
+        elif spider.output_format == 'fieldtagged':
+            print('爬取完成，开始导入数据库(fieldtagged/plaintext)')
+            plaintex_parser.parse(input_dir=spider.output_path_prefix + '/advanced_query/{}'.format(spider.timestamp),
+                                  db_path=spider.output_path_prefix + '/advanced_query/{}/result.db'.format(
+                                      spider.timestamp))
+

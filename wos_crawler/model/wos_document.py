@@ -15,6 +15,8 @@ class WosDocument(Base):
     publisher = Column(String)
     volume = Column(Integer)
     issue = Column(String) # 因为可能有SI：Special Issue，所以是String
+    start_page = Column(String) # 因为有可能是电子出版，页码包含E
+    end_page = Column(String)
     pub_year = Column(Integer)
     pub_month_day = Column(String)
     document_type = Column(String)
@@ -36,10 +38,10 @@ class WosDocument(Base):
     references = relationship('WosReference', back_populates='document')
     fundings = relationship('WosFunding', back_populates='document')
 
-    def __init__(self, unique_id, title, abs, journal, journal_iso, publisher,
-                 volume, issue, pub_year, pub_month_day, document_type,
-                 doi, cited_times, reference_num, usage_180, usage_since_2013,
-                 funding_text, language, author_email):
+    def __init__(self, unique_id=None, title=None, abs=None, journal=None, journal_iso=None, publisher=None,
+                 volume=None, issue=None, start_page=None,end_page=None,pub_year=None, pub_month_day=None, document_type=None,
+                 doi=None, cited_times=None, reference_num=None, usage_180=None, usage_since_2013=None,
+                 funding_text=None, language=None, author_email=None):
         self.unique_id = unique_id
         self.title = title
         self.abs = abs
@@ -48,6 +50,8 @@ class WosDocument(Base):
         self.publisher = publisher
         self.volume = volume
         self.issue = issue
+        self.start_page = start_page
+        self.end_page = end_page
         self.pub_year = pub_year
         self.pub_month_day = pub_month_day
         self.document_type = document_type
@@ -168,7 +172,7 @@ class WosReference(Base):
     pub_year = Column(Integer)
     journal = Column(String)
     volume = Column(Integer)
-    start_page = Column(Integer)
+    start_page = Column(String) #因为有电子出版的可能，所以有可能是E开头
     doi = Column(String)
 
     def __init__(self, first_author, pub_year, journal, volume, start_page, doi):

@@ -8,9 +8,9 @@ def author(document):
             #     .replace('\\', '').split(' and ')
             document['author'] = document['author'].lower().replace('\n', ' ').replace('\\', '').split(' and ')
         else:
-            document['author'] = [None]
+            document['author'] = None
     else:
-        document['author'] = [None]
+        document['author'] = None
     return document
 
 
@@ -41,133 +41,7 @@ def author(document):
 #     10. 有些人只有姓没名字（荷兰人）
 #     11. 有的人名字里面有逗号（夏威夷人，不是中间名）
 #     12. 有的作者没有机构地址
-#
-#     select a.author_order, a.last_name, a.first_name, b.address from wos_author as a
-#     left join wos_affiliation as b on a.author_id = b.author_id order by a.author_order
-#
-#     :param document:
-#     :return:
-#     """
-#
-#     if 'affiliation' in document:
-#         if document['affiliation']:
-#             result = {}
-#             reprint_author_name = []
-#             all_author = set()
-#             ordered_author_list = document['author']
-#             affiliations = document['affiliation'][1:-1].lower().replace(', jr.', '').replace(', sr.', '').replace('\\',
-#                                                                                                                    '').split(
-#                 '\n')
-#             for affiliation in affiliations:
-#                 space_flag = False
-#                 author_list = []
-#                 tmp = affiliation.split('; ')
-#                 if len(tmp) > 1:
-#                     # 处理空格情况
-#                     pos = find_nth(tmp[-1], ',', 2)
-#                     if tmp[-1][:pos] not in ordered_author_list:
-#                         pos = tmp[-1].index(',')
-#                         space_flag = True
-#
-#                     author_list += tmp[:-1]
-#
-#                     if 'reprint author' in tmp[-1]:
-#                         pos2 = tmp[-1].index(',')
-#                         reprint_author_name += tmp[:-1]
-#
-#                         # 处理没有名字只有姓的情况
-#                         reprint_name = tmp[-1][:pos2 + 3]
-#                         if 'reprint author' in reprint_name:
-#                             reprint_name = tmp[-1][:tmp[-1].index('(') - 1]
-#                         reprint_author_name.append(reprint_name)
-#                         continue
-#
-#                     author_list.append(tmp[-1][:pos])
-#                     # tmp[-1] = tmp[-1][pos + 2:]
-#                     # address = tmp[-1]
-#                     address = tmp[-1][pos + 2:]
-#                 else:
-#                     # 处理空格情况
-#                     pos = find_nth(tmp[0], ',', 2)
-#                     if tmp[0][:pos] not in ordered_author_list:
-#                         pos = tmp[0].index(',')
-#                         space_flag = True
-#
-#                     address = tmp[0][pos + 2:]
-#
-#                     if 'reprint author' in tmp[0]:
-#                         pos2 = tmp[0].index(',')
-#                         # 处理没有名字只有姓的情况
-#                         reprint_name = tmp[0][:pos2 + 3]
-#                         if 'reprint author' in reprint_name:
-#                             reprint_name = tmp[0][:tmp[0].index('(') - 1]
-#                         reprint_author_name.append(reprint_name)
-#                         continue
-#
-#                     author_list.append(tmp[0][:pos])
-#                 # print(author_list)
-#                 for author in author_list:
-#                     is_reprint = 0
-#                     for name in reprint_author_name:
-#                         if space_flag:
-#                             name = name.replace(',', '')
-#                         if name in author:
-#                             is_reprint = 1
-#                     try:
-#                         last_name, first_name = author.split(',')
-#                     except:
-#                         try:
-#                             last_name, first_name = author.split(' ')
-#                         except:
-#                             last_name, first_name = author, None
-#                         address = tmp[-1][tmp[-1].index(',') + 2:]
-#
-#                     try:
-#
-#                         # 处理名字中有逗号的情况（需要调换顺序）
-#                         name_split = author.split(', ')
-#                         if len(name_split) == 3:
-#                             new_name = '{}, {}, {}'.format(name_split[0], name_split[2], name_split[1])
-#                             author_order = ordered_author_list.index(new_name) + 1
-#                         else:
-#                             author_order = ordered_author_list.index(author) + 1
-#                     except ValueError as e:
-#                         print(document['unique-id'], '文献存在没有作者归属的机构，该机构将被舍弃', author)
-#                         continue
-#
-#                     if (first_name, last_name, author_order, is_reprint) in result:
-#                         result[(first_name, last_name, author_order, is_reprint)] \
-#                             .append(address)
-#                     else:
-#                         result[(first_name, last_name, author_order, is_reprint)] = [address]
-#
-#                     all_author.add(author)
-#
-#             # 处理作者没有机构的情况（不处理会导致作者缺失）
-#             if len(all_author) < len(ordered_author_list):
-#                 # print(len(all_author), all_author)
-#                 # print(len(ordered_author_list), ordered_author_list)
-#                 print('{} 文献有{}个作者没有机构，设NULL'.format(document['unique-id'], len(ordered_author_list) - len(all_author)))
-#                 for add_author in ordered_author_list:
-#                     if add_author not in all_author:
-#                         try:
-#                             last_name, first_name = add_author.split(', ')
-#                         except:
-#                             try:
-#                                 last_name, first_name = add_author.split(', ')[0], ', '.join(add_author.split(', ')[1:])
-#                             except:
-#                                 try:
-#                                     last_name, first_name = add_author.split(' ')
-#                                 except:
-#                                     last_name, first_name = add_author, None
-#                         result[(first_name, last_name, ordered_author_list.index(add_author) + 1, 0)] = [None]
-#
-#             document['affiliation'] = result
-#         else:
-#             document['affiliation'] = {(None, None, None, None): None}
-#     else:
-#         document['affiliation'] = {(None, None, None, None): None}
-#     return document
+
 
 
 def author_affiliation_v2(document):
@@ -296,9 +170,10 @@ def author_affiliation_v2(document):
 
             document['affiliation'] = result
         else:
-            document['affiliation'] = {(None, None, None, None): None}
+            # document['affiliation'] = {(None, None, None, None): None}
+            document['affiliation'] = None
     else:
-        document['affiliation'] = {(None, None, None, None): None}
+        document['affiliation'] = None
     return document
 
 
@@ -308,9 +183,9 @@ def wos_category(document):
             document['web-of-science-categories'] = document['web-of-science-categories'][1:-1] \
                 .lower().replace('\n', '').replace('\\', '').split('; ')
         else:
-            document['web-of-science-categories'] = [None]
+            document['web-of-science-categories'] = None
     else:
-        document['web-of-science-categories'] = [None]
+        document['web-of-science-categories'] = None
     return document
 
 
@@ -320,9 +195,9 @@ def research_area(document):
             document['research-areas'] = document['research-areas'][1:-1] \
                 .lower().replace('\n', '').replace('\\', '').split('; ')
         else:
-            document['research-areas'] = [None]
+            document['research-areas'] = None
     else:
-        document['research-areas'] = [None]
+        document['research-areas'] = None
     return document
 
 
@@ -331,9 +206,9 @@ def keyword(document):
         if document['keywords']:
             document['keywords'] = document['keywords'][1:-1].lower().replace('\n', ' ').replace('\\', '').split('; ')
         else:
-            document['keywords'] = [None]
+            document['keywords'] = None
     else:
-        document['keywords'] = [None]
+        document['keywords'] = None
     return document
 
 
@@ -343,61 +218,104 @@ def keyword_plus(document):
             document['keywords-plus'] = document['keywords-plus'][1:-1] \
                 .lower().replace('\n', ' ').replace('\\', '').split('; ')
         else:
-            document['keywords-plus'] = [None]
+            document['keywords-plus'] = None
     else:
-        document['keywords-plus'] = [None]
+        document['keywords-plus'] = None
     return document
 
 
 def reference(document):
     if 'cited-references' in document:
         if document['cited-references']:
-            volume_pattern = re.compile(r'v\d+')
-            page_pattern = re.compile(r'p\d+')
-            doi_pattern = re.compile(r'doi .+')
+            volume_pattern = re.compile(r'^v\d+$')
+            page_pattern = re.compile(r'^p\w*\d+$')
+            doi_pattern = re.compile(r'^doi \d+.+$')
+            year_pattern = re.compile(r'^\d+$')
 
             result = []
             references = document['cited-references'][1:-1].lower().replace('{[}', '[').replace('\\', '').split('\n')
 
             for reference in references:
-                ref_split = reference[:-1].split(', ')
+                try:
+                    ref_split = reference[:-1].split(', ')
+                    first_author = None
+                    pub_year = None
+                    journal = None
+                    volume = None
+                    start_page = None
+                    doi = None
 
-                first_author = ref_split[0]
-                pub_year = ref_split[1]
-                journal = None
-                volume = None
-                start_page = None
-                doi = None
+                    year_flag = False
 
-                min_i = 999
-                for i_part in range(2, len(ref_split)):
-                    volume_match = volume_pattern.match(ref_split[i_part])
-                    page_match = page_pattern.match(ref_split[i_part])
-                    doi_match = doi_pattern.match(ref_split[i_part])
+                    if len(ref_split) < 2:
+                        journal = ref_split[0]
+                    else:
+                        i_list = []
+                        for i_part in range(len(ref_split)):
+                            volume_match = volume_pattern.match(ref_split[i_part])
+                            page_match = page_pattern.match(ref_split[i_part])
+                            doi_match = doi_pattern.match(ref_split[i_part])
+                            year_match = year_pattern.match(ref_split[i_part])
 
-                    if volume_match:
-                        volume = ref_split[i_part][1:]
-                        if i_part < min_i:
-                            min_i = i_part
-                    elif page_match:
-                        start_page = ref_split[i_part][1:]
-                        if i_part < min_i:
-                            min_i = i_part
-                    elif doi_match:
-                        doi = ref_split[i_part].replace('doi ', '').replace('[', '').replace(']', '')
-                        if i_part < min_i:
-                            min_i = i_part
+                            if year_match:
+                                pub_year = ref_split[i_part]
+                                i_list.append(i_part)
+                                year_flag = True
+                            elif volume_match:
+                                volume = ref_split[i_part][1:]
+                                i_list.append(i_part)
+                            elif page_match:
+                                start_page = ref_split[i_part][1:]
+                                i_list.append(i_part)
+                            elif doi_match:
+                                doi = ref_split[i_part].replace('doi ', '').replace('[', '').replace(']', '')
+                                i_list.append(i_part)
 
-                if min_i > 2:
-                    journal = ', '.join(ref_split[2:min_i])
+                        i_list.sort()
+                        if len(i_list) > 0:
+                            if min(i_list) > 0:
+                                first_author = ref_split[0]
+                            start_pos = None
+                            end_pos = None
+                            pos = 0
+                            while pos < len(i_list) - 1:
+                                if i_list[pos + 1] - i_list[pos] > 1:
+                                    start_pos = i_list[pos] + 1
+                                if start_pos is not None and i_list[pos + 1] - i_list[pos] == 1:
+                                    end_pos = i_list[pos]
+                                    break
+                                pos += 1
+                            if start_pos is not None or end_pos is not None:
+                                if start_pos == end_pos:
+                                    journal = ref_split[start_pos]
+                                elif end_pos is None:
+                                    journal = ', '.join(ref_split[start_pos:i_list[-1]])
+                                else:
+                                    journal = ', '.join(ref_split[start_pos:end_pos])
+
+                            else:
+                                if year_flag:
+                                    try:
+                                        journal = ref_split[i_list[-1] + 1]
+                                    except:
+                                        journal = None
+                                else:
+                                    journal = ref_split[i_list[0] - 1]
+                        else:
+                            first_author = ref_split[0]
+                            journal = ref_split[1]
+                except Exception as e:
+                    print(e)
+                    exit(-1)
+
 
                 result.append((first_author, pub_year, journal, volume, start_page, doi))
-
             document['cited-references'] = result
         else:
-            document['cited-references'] = [(None, None, None, None, None, None)]
+            # document['cited-references'] = [(None, None, None, None, None, None)]
+            document['cited-references'] = None
     else:
-        document['cited-references'] = [(None, None, None, None, None, None)]
+        document['cited-references'] = None
     return document
 
 
@@ -434,9 +352,10 @@ def funding(document):
                 result[agent] = numbers
             document['funding-acknowledgement'] = result
         else:
-            document['funding-acknowledgement'] = {None: [None]}
+            # document['funding-acknowledgement'] = {None: [None]}
+            document['funding-acknowledgement'] = None
     else:
-        document['funding-acknowledgement'] = {None: [None]}
+        document['funding-acknowledgement'] = None
     return document
 
 
