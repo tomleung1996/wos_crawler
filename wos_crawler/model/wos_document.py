@@ -13,7 +13,7 @@ class WosDocument(Base):
     journal = Column(String(255))
     journal_iso = Column(String(100))
     publisher = Column(String(255))
-    volume = Column(Integer)
+    volume = Column(String(50)) # 有可能有AB卷
     issue = Column(String(10)) # 因为可能有SI：Special Issue，所以是String
     start_page = Column(String(10)) # 因为有可能是电子出版，页码包含E
     end_page = Column(String(10))
@@ -171,7 +171,7 @@ class WosReference(Base):
     first_author = Column(String(255))
     pub_year = Column(Integer)
     journal = Column(String(255))
-    volume = Column(Integer)
+    volume = Column(String(50)) # 有可能有AB卷
     start_page = Column(String(100)) #因为有电子出版的可能，所以有可能是E开头
     doi = Column(String(255))
 

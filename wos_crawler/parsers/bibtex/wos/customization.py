@@ -230,7 +230,7 @@ def reference(document):
             volume_pattern = re.compile(r'^v\d+$')
             page_pattern = re.compile(r'^p\w*\d+$')
             doi_pattern = re.compile(r'^doi \d+.+$')
-            year_pattern = re.compile(r'^\d+$')
+            year_pattern = re.compile(r'^\d{4}$')
 
             result = []
             references = document['cited-references'][1:-1].lower().replace('{[}', '[').replace('\\', '').split('\n')
@@ -307,6 +307,12 @@ def reference(document):
                 except Exception as e:
                     print(e)
                     exit(-1)
+
+                # 由于参考文献字段非常不规范，经常超长，所以使用截断
+                if first_author is not None and len(first_author) > 254:
+                    first_author = first_author[:254]
+                if journal is not None and len(journal) > 254:
+                    journal = journal[:254]
 
 
                 result.append((first_author, pub_year, journal, volume, start_page, doi))

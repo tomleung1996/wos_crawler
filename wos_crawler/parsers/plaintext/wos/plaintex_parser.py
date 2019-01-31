@@ -15,7 +15,7 @@ def parse_single(input_file=None, db_path=None):
     volume_pattern = re.compile(r'^v\d+$')
     page_pattern = re.compile(r'^p\w*\d+$')
     doi_pattern = re.compile(r'^doi \d+.+$')
-    year_pattern = re.compile(r'^\d+$')
+    year_pattern = re.compile(r'^\d{4}$')
 
     print('正在解析{}……'.format(input_file))
 
@@ -139,28 +139,7 @@ def parse_single(input_file=None, db_path=None):
                     funding_line += ' ' + line[3:]
                 else:
                     funding_line = line[3:]
-                # if wos_document.funding_text is not None:
-                #     wos_document.funding_text += ' '+line[3:]
-                # else:
-                #     wos_document.funding_text = line[3:]
             elif cur_field == 'fx ':
-                # if tmp == cur_field:
-                #     # 说明现在是第一行，需要处理上面暂存的内容了
-                #     fundings = wos_document.funding_text.split('; ')
-                #     for fund in fundings:
-                #         pos = find_nth(fund, '[', -1)
-                #         if pos != -1:
-                #             funding = [fund[:pos], fund[pos:]]
-                #             agent = funding[0]
-                #             numbers = funding[1].replace('[', '').replace(']', '').split(', ')
-                #             for number in numbers:
-                #                 f = WosFunding(agent, number)
-                #                 f.document = wos_document
-                #         else:
-                #             agent = fund
-                #             f = WosFunding(agent, None)
-                #             f.document = wos_document
-                #     wos_document.funding_text = None
                 if wos_document.funding_text is not None:
                     wos_document.funding_text += ' ' + line[3:]
                 else:
@@ -240,17 +219,23 @@ def parse_single(input_file=None, db_path=None):
                         first_author = ref_split[0]
                         journal = ref_split[1]
 
+                # 由于参考文献字段非常不规范，经常超长，所以使用截断
+                if first_author is not None and len(first_author) > 254:
+                    first_author = first_author[:254]
+                if journal is not None and len(journal) > 254:
+                    journal = journal[:254]
+
                 ref = WosReference(first_author, pub_year, journal, volume, start_page, doi)
                 ref.document = wos_document
 
             elif cur_field == 'nr ':
-                wos_document.reference_num = line[3:]
+                wos_document.reference_num = int(line[3:])
             elif cur_field == 'tc ':
-                wos_document.cited_times = line[3:]
+                wos_document.cited_times = int(line[3:])
             elif cur_field == 'u1 ':
-                wos_document.usage_180 = line[3:]
+                wos_document.usage_180 = int(line[3:])
             elif cur_field == 'u2':
-                wos_document.usage_since_2013 = line[3:]
+                wos_document.usage_since_2013 = int(line[3:])
             elif cur_field == 'pu ':
                 wos_document.publisher = line[3:]
             elif cur_field == 'ji ':
@@ -286,6 +271,8 @@ def parse_single(input_file=None, db_path=None):
                 if keyword_line is not None:
                     keywords = keyword_line.split('; ')
                     for keyword in keywords:
+                        if len(keyword) > 254:
+                            keyword = keyword[:254]
                         key = WosKeyword(keyword)
                         key.document = wos_document
                     keyword_line = None
@@ -293,6 +280,8 @@ def parse_single(input_file=None, db_path=None):
                 if keyword_plus_line is not None:
                     keyword_plus = keyword_plus_line.split('; ')
                     for kp in keyword_plus:
+                        if len(kp) > 254:
+                            kp = kp[:254]
                         keyp = WosKeywordPlus(kp)
                         keyp.document = wos_document
                     keyword_plus_line = None
@@ -300,6 +289,8 @@ def parse_single(input_file=None, db_path=None):
                 if wos_category_line is not None:
                     categories = wos_category_line.split('; ')
                     for category in categories:
+                        if len(category) > 254:
+                            category = category[:254]
                         cat = WosCategory(category)
                         cat.document = wos_document
                     wos_category_line = None
@@ -307,6 +298,8 @@ def parse_single(input_file=None, db_path=None):
                 if research_area_line is not None:
                     areas = research_area_line.split('; ')
                     for area in areas:
+                        if len(area) > 254:
+                            area = area[:254]
                         a = WosResearchArea(area)
                         a.document = wos_document
                     research_area_line = None
@@ -350,5 +343,5 @@ def parse(input_dir=None, db_path=None):
 
 
 if __name__ == '__main__':
-    parse(input_dir=r'C:\Users\Tom\PycharmProjects\wos_crawler\output\advanced_query\2019-01-31-10.21.19',
+    parse(input_dir=r'C:\Users\Tom\PycharmProjects\wos_crawler\output\advanced_query\remain',
           db_path='C:/Users/Tom/Desktop/test2.db')
