@@ -11,6 +11,7 @@ def get_engine(db_path=None):
         engine = create_engine('sqlite:///wos_crawler_result_{}.db'.format(timestamp))
     else:
         engine = create_engine('sqlite:///{}'.format(db_path))
+    # engine = create_engine('mysql+pymysql://root:root@localhost:3306/test?charset=utf8', encoding='utf-8')
     return engine
 
 

@@ -6,29 +6,29 @@ from . import Base
 class WosDocument(Base):
     __tablename__ = 'wos_document'
 
-    document_id = Column(Integer, primary_key=True)
-    unique_id = Column(String)
-    title = Column(String)
+    # document_id = Column(Integer, primary_key=True)
+    unique_id = Column(String(20), primary_key=True)
+    title = Column(String(500))
     abs = Column(Text)
-    journal = Column(String)
-    journal_iso = Column(String)
-    publisher = Column(String)
+    journal = Column(String(255))
+    journal_iso = Column(String(100))
+    publisher = Column(String(255))
     volume = Column(Integer)
-    issue = Column(String) # 因为可能有SI：Special Issue，所以是String
-    start_page = Column(String) # 因为有可能是电子出版，页码包含E
-    end_page = Column(String)
+    issue = Column(String(10)) # 因为可能有SI：Special Issue，所以是String
+    start_page = Column(String(10)) # 因为有可能是电子出版，页码包含E
+    end_page = Column(String(10))
     pub_year = Column(Integer)
-    pub_month_day = Column(String)
-    document_type = Column(String)
-    doi = Column(String)
+    pub_month_day = Column(String(10))
+    document_type = Column(String(50))
+    doi = Column(String(255))
     cited_times = Column(Integer)
     reference_num = Column(Integer)
     usage_180 = Column(Integer)
     usage_since_2013 = Column(Integer)
     # funding = Column(Text)
     funding_text = Column(Text)
-    language = Column(String)
-    author_email = Column(String)
+    language = Column(String(20))
+    author_email = Column(String(255))
 
     authors = relationship('WosAuthor', back_populates='document')
     categories = relationship('WosCategory', back_populates='document')
@@ -74,11 +74,11 @@ class WosAuthor(Base):
 
     author_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String, ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
     document = relationship('WosDocument', back_populates='authors')
 
-    last_name = Column(String)
-    first_name = Column(String)
+    last_name = Column(String(255))
+    first_name = Column(String(255))
     author_order = Column(Integer)
     is_reprint_author = Column(Integer)
     affiliations = relationship('WosAffiliation', back_populates='author')
@@ -98,10 +98,10 @@ class WosCategory(Base):
 
     category_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String, ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
     document = relationship('WosDocument', back_populates='categories')
 
-    category = Column(String)
+    category = Column(String(255))
 
     def __init__(self, category):
         self.category = category
@@ -114,10 +114,10 @@ class WosResearchArea(Base):
 
     category_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String, ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
     document = relationship('WosDocument', back_populates='research_areas')
 
-    area = Column(String)
+    area = Column(String(255))
 
     def __init__(self, area):
         self.area = area
@@ -131,10 +131,10 @@ class WosKeyword(Base):
 
     keyword_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String, ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
     document = relationship('WosDocument', back_populates='keywords')
 
-    keyword = Column(String)
+    keyword = Column(String(255))
 
     def __init__(self, keyword):
         self.keyword = keyword
@@ -148,10 +148,10 @@ class WosKeywordPlus(Base):
 
     keyword_plus_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String, ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
     document = relationship('WosDocument', back_populates='keyword_plus')
 
-    keyword_plus = Column(String)
+    keyword_plus = Column(String(255))
 
     def __init__(self, keyword_plus):
         self.keyword_plus = keyword_plus
@@ -165,15 +165,15 @@ class WosReference(Base):
 
     reference_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String, ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
     document = relationship('WosDocument', back_populates='references')
 
-    first_author = Column(String)
+    first_author = Column(String(255))
     pub_year = Column(Integer)
-    journal = Column(String)
+    journal = Column(String(255))
     volume = Column(Integer)
-    start_page = Column(String) #因为有电子出版的可能，所以有可能是E开头
-    doi = Column(String)
+    start_page = Column(String(100)) #因为有电子出版的可能，所以有可能是E开头
+    doi = Column(String(255))
 
     def __init__(self, first_author, pub_year, journal, volume, start_page, doi):
         self.first_author = first_author
@@ -197,7 +197,7 @@ class WosAffiliation(Base):
     author_id = Column(Integer, ForeignKey('wos_author.author_id'))
     author = relationship('WosAuthor', back_populates='affiliations')
 
-    address = Column(String)
+    address = Column(String(500))
 
     def __init__(self, address):
         self.address = address
@@ -211,11 +211,11 @@ class WosFunding(Base):
 
     funding_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String, ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
     document = relationship('WosDocument', back_populates='fundings')
 
-    agent = Column(String)
-    funding_number = Column(String)
+    agent = Column(String(500))
+    funding_number = Column(String(255))
 
     def __init__(self, agent, funding_number):
         self.agent = agent

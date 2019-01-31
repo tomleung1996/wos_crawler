@@ -328,7 +328,7 @@ def parse_single(input_file=None, db_path=None):
                             f.document = wos_document
                     funding_line = None
 
-            wos_document_list.append(wos_document)
+                wos_document_list.append(wos_document)
 
 
     print('解析{}完成，正在写入数据库……'.format(input_file))
