@@ -5,12 +5,12 @@ import time
 
 Base = declarative_base()
 
-def get_engine(db_path=None):
+def get_engine(db_path=None, echo=False):
     if not db_path:
         timestamp = str(time.strftime('%Y-%m-%d-%H.%M.%S',time.localtime(time.time())))
-        engine = create_engine('sqlite:///wos_crawler_result_{}.db'.format(timestamp))
+        engine = create_engine('sqlite:///wos_crawler_result_{}.db'.format(timestamp), echo=echo)
     else:
-        engine = create_engine('sqlite:///{}'.format(db_path))
+        engine = create_engine('sqlite:///{}'.format(db_path), echo=echo)
     # engine = create_engine('mysql+pymysql://root:root@localhost:3306/test?charset=utf8', encoding='utf-8')
     return engine
 

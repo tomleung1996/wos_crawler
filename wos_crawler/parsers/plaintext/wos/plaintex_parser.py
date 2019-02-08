@@ -343,5 +343,5 @@ def parse(input_dir=None, db_path=None):
 
 
 if __name__ == '__main__':
-    parse(input_dir=r'C:\Users\Tom\PycharmProjects\wos_crawler\output\advanced_query\remain',
+    parse(input_dir=r'C:\Users\Tom\PycharmProjects\wos_crawler\output\advanced_query\2019-01-31-10.21.19',
           db_path='C:/Users/Tom/Desktop/test2.db')

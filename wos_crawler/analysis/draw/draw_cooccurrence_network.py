@@ -2,17 +2,19 @@ import plotly
 import plotly.graph_objs as go
 import plotly.io as pio
 import networkx as nx
+import matplotlib.pyplot as plt
 
 
 def draw_net(G: nx.Graph, title='co-occurrence', output_path=None):
     assert output_path is not None
-    pos = nx.kamada_kawai_layout(G, scale=2)
+    pos = nx.kamada_kawai_layout(G)
+    # pos = nx.nx_pydot.graphviz_layout(G, prog='fdp')
     nx.set_node_attributes(G, pos, 'pos')
 
     edge_trace = go.Scatter(
         x=[],
         y=[],
-        line=dict(width=0.5, color='#888'),
+        line=dict(width=0.8, color='#888'),
         hoverinfo='none',
         mode='lines')
 
@@ -27,10 +29,12 @@ def draw_net(G: nx.Graph, title='co-occurrence', output_path=None):
         y=[],
         text=[],
         textfont=dict(
-            size=[]
+            size=[],
+            family=['Times New Roman']
         ),
         mode='markers',
         hoverinfo='text',
+        opacity=1,
         marker=dict(
             showscale=True,
             # colorscale options
@@ -38,6 +42,7 @@ def draw_net(G: nx.Graph, title='co-occurrence', output_path=None):
             # 'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
             # 'Hot' | 'Blackbody' | 'Earth' | 'Electric' | 'Viridis' |
             colorscale='Jet',
+            opacity=0.9,
             reversescale=False,
             color=[],
             size=[],
@@ -56,14 +61,14 @@ def draw_net(G: nx.Graph, title='co-occurrence', output_path=None):
 
     for node, adjacencies in enumerate(G.adjacency()):
         node_trace['marker']['color'] += tuple([len(adjacencies[1])])
-        node_trace['textfont']['size'] += tuple([len(adjacencies[1]) + 1])
-        node_info = '{}, # of neighbors: {}'.format(adjacencies[0], len(adjacencies[1]))
+        node_trace['textfont']['size'] += tuple([len(adjacencies[1]) * 5 + 1])
+        node_info = adjacencies[0].title()
         node_trace['text'] += tuple([node_info])
-        node_trace['marker']['size'] += tuple([len(adjacencies[1])])
+        node_trace['marker']['size'] += tuple([len(adjacencies[1]) * 5])
 
     fig = go.Figure(data=[edge_trace, node_trace],
                     layout=go.Layout(
-                        title='<br>'+title,
+                        title='<br>' + title,
                         titlefont=dict(size=16),
                         showlegend=False,
                         hovermode='closest',
@@ -76,5 +81,5 @@ def draw_net(G: nx.Graph, title='co-occurrence', output_path=None):
                         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
 
-
-    plotly.offline.plot(fig, filename='{}.html'.format(output_path), auto_open=False, image_width=1600, image_height=900, image='png')
+    plotly.offline.plot(fig, filename='{}.html'.format(output_path), auto_open=False, image_width=1600,
+                        image_height=900, image='png')

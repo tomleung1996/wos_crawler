@@ -66,7 +66,7 @@ class WosDocument(Base):
         self.author_email = author_email
 
     def __repr__(self):
-        return '文章编号：{}，唯一ID：{}，标题：{}'.format(self.document_id, self.unique_id, self.title)
+        return '文章唯一ID：{}，标题：{}'.format(self.unique_id, self.title)
 
 
 class WosAuthor(Base):
