@@ -110,3 +110,4 @@ venv.bak/
 wos_crawler/__pycache__/
 wos_crawler/spiders/__pycache__/
 wos_crawler/test
+.vscode/
