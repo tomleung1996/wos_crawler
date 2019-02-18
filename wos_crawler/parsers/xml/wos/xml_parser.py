@@ -259,19 +259,37 @@ def get_references(name_space, references):
             doi = reference.find('./{}doi'.format(name_space))
 
             if first_author is not None:
-                first_author = first_author.text.replace(',', '').lower()
+                if first_author.text is not None:
+                    first_author = first_author.text.replace(',', '').lower()
+                else:
+                    first_author = None
             else:
                 first_author = '[anonymous]'
             if pub_year is not None:
-                pub_year = pub_year.text.lower()
+                if pub_year.text is not None:
+                    pub_year = pub_year.text.lower()
+                else:
+                    pub_year = None
             if journal is not None:
-                journal = journal.text.replace('.', '').lower()
+                if journal.text is not None:
+                    journal = journal.text.replace('.', '').lower()
+                else:
+                    journal = None
             if volume is not None:
-                volume = volume.text.lower()
+                if volume.text is not None:
+                    volume = volume.text.lower()
+                else:
+                    volume = None
             if start_page is not None:
-                start_page = start_page.text.lower()
+                if start_page.text is not None:
+                    start_page = start_page.text.lower()
+                else:
+                    start_page = None
             if doi is not None:
-                doi = doi.text.lower()
+                if doi.text is not None:
+                    doi = doi.text.lower()
+                else:
+                    doi = None
 
             wos_reference = WosReference(first_author, pub_year, journal, volume, start_page, doi)
             reference_list.append(wos_reference)

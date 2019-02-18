@@ -6,6 +6,7 @@ import networkx as nx
 from analysis.draw.draw_cooccurrence_network import draw_net
 import matplotlib.pyplot as plt
 from sqlalchemy import func, desc
+import os
 
 def draw_cooccurrence_network(net_type=None, db_path=None, output_path=None, top_n=30):
     assert net_type is not None and output_path is not None and db_path is not None
