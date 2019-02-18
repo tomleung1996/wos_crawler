@@ -222,4 +222,4 @@ class WosFunding(Base):
         self.funding_number = funding_number
 
     def __repr__(self):
-        return '文章{}的基金：{}'.format(self.document_unique_id, self.agent + ': ' + self.funding_number)
+        return '文章{}的基金：{}'.format(self.document_unique_id, self.agent + ': ' + self.funding_number if self.funding_number is not None else 'None')

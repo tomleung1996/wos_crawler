@@ -28,6 +28,7 @@ def parse_single(input_file=None, db_path=None):
         wos_document_list = []
 
         # 有些换行了的字段先暂存，等到最后再处理
+        journal_line = None
         wos_category_line = None
         research_area_line = None
         keyword_line = None
@@ -112,7 +113,10 @@ def parse_single(input_file=None, db_path=None):
                 else:
                     wos_document.title = title
             elif cur_field == 'so ':
-                wos_document.journal = line[3:]
+                if journal_line is not None:
+                    journal_line += ' ' + line[3:]
+                else:
+                    journal_line = line[3:]
             elif cur_field == 'la ':
                 wos_document.language = line[3:]
             elif cur_field == 'dt ':
@@ -148,7 +152,7 @@ def parse_single(input_file=None, db_path=None):
                 # 解析参考文献
 
                 reference = line[3:]
-                ref_split = reference[:-1].split(', ')
+                ref_split = reference.split(', ')
                 first_author = None
                 pub_year = None
                 journal = None
@@ -268,6 +272,10 @@ def parse_single(input_file=None, db_path=None):
                 wos_document.unique_id = line[7:]
             elif cur_field == 'er':
                 # 在最后一行处理多行字段的问题
+                if journal_line is not None:
+                    wos_document.journal = journal_line
+                    journal_line = None
+
                 if keyword_line is not None:
                     keywords = keyword_line.split('; ')
                     for keyword in keywords:
@@ -343,5 +351,5 @@ def parse(input_dir=None, db_path=None):
 
 
 if __name__ == '__main__':
-    parse(input_dir=r'C:\Users\Tom\PycharmProjects\wos_crawler\output\advanced_query\2019-01-31-10.21.19',
-          db_path='C:/Users/Tom/Desktop/test2.db')
+    parse(input_dir=r'C:\Users\Tom\PycharmProjects\wos_crawler\input\test',
+          db_path='C:/Users/Tom/Desktop/test-plain.db')
