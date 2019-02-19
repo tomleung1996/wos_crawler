@@ -5,7 +5,7 @@
 - 支持爬取给定**期刊列表**爬取期刊上的全部文章（题录信息）
 - 支持选择目标文献类型，如Article、Proceeding paper等
 - 支持多种爬取结果的保存格式，如Plain text、Bibtex、HTML等，**推荐使用Plain text，解析速度最快**
-- 支持将爬取结果**解析、导入**数据库（目前仅Plain text、Bibtex格式支持解析、导入），解析数据项除了基本的文献信息外（标题、摘要、关键词、被引量等），还包括作者机构、基金、分类、参考文献等信息
+- 支持将爬取结果**解析、导入**数据库（目前支持Plain text、Bibtex、XML格式解析、导入），解析数据项除了基本的文献信息外（标题、摘要、关键词、被引量等），还包括作者机构、基金、分类、参考文献等信息
 
 程序主要依赖：Scrapy、BeautifulSoup、PyQt5、SQLAlchemy、[bibtexparser](https://github.com/sciunto-org/python-bibtexparser)、[qt5reactor](https://github.com/sunu/qt5reactor)、networkX
 ## 使用方法 
@@ -32,6 +32,7 @@
 - 因为Web of Science本身的限制，单个检索式如果**结果数大于10万**的话，大于10万的部分无法导出（即使手工也不行），此时可以通过年份划分来减少结果数，分批导出
 - 导入数据库后，查询得到的结果条数可能会与网页结果数有偏差，我在定位目标批次后使用浏览器手动导出的方式证实了是WoS的问题（手动导出结果不足500条）。1万条结果会缺少5条左右
 - 注重爬取道德，如有必要请设置合理的下载延迟。本程序可以视为是没有购买Web of Science API的一种替代解决方案，如果有更专业的需要请订阅[WWS API](https://clarivate.com/products/data-integration/)
+- 本程序虽不能通过WWS API获取数据，但是支持解析WWS API获得的XML文件
 - 程序BUG在所难免，请在评论留言或提交ISSUE
 
 ## 输出格式 

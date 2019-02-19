@@ -432,5 +432,5 @@ def parse(input_dir=None, db_path=None):
 
 
 if __name__ == '__main__':
-    parse(input_dir=r'C:\Users\Tom\PycharmProjects\wos_crawler\input\test',
+    parse(input_dir=r'C:\Users\Tom\Desktop\test\2',
           db_path='C:/Users/Tom/Desktop/test-xml.db')
