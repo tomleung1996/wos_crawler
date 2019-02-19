@@ -5,10 +5,10 @@ import os
 import time
 
 
-def parse_single(input_file=None, db_path=None):
-    assert input_file is not None and db_path is not None
+def parse_single(input_file=None, db_path=None, db_url=None):
+    assert input_file is not None and (db_path is not None or db_url is not None)
 
-    engine = get_engine(db_path)
+    engine = get_engine(db_path, db_url)
     Base.metadata.create_all(engine)
     session = get_session(engine)
 
@@ -420,13 +420,13 @@ def get_fundings(fundings):
     return funding_list
 
 
-def parse(input_dir=None, db_path=None):
-    assert input_dir is not None and db_path is not None
+def parse(input_dir=None, db_path=None, db_url=None):
+    assert input_dir is not None and (db_path is not None or db_url is not None)
 
     for root, dirs, files in os.walk(input_dir):
         for file in files:
             if file[-4:] == '.xml':
-                parse_single(os.path.join(root, file), db_path)
+                parse_single(os.path.join(root, file), db_path, db_url)
 
     print('全部解析完成')
 

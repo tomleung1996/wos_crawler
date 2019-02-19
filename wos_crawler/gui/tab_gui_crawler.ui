@@ -1,0 +1,717 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>487</width>
+    <height>577</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Web of Science Crawler</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>471</width>
+      <height>541</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Crawler</string>
+     </attribute>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>335</width>
+        <height>441</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <item>
+              <widget class="QRadioButton" name="radioButtonJournal">
+               <property name="text">
+                <string>期刊列表爬取</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEditJournal">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="readOnly">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <item>
+              <widget class="QRadioButton" name="radioButtonQuery">
+               <property name="text">
+                <string>高级检索式爬取</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QTextEdit" name="textEditQuery"/>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QLabel" name="labelOutputPath">
+             <property name="text">
+              <string>保存路径</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEditOutputPath"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>文献类型</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxDocumentType">
+             <item>
+              <property name="text">
+               <string>All document types</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Article</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Abstract of Published Item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Art Exhibit Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Bibliography</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Biographical-Item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Book</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Book Chapter</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Book Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Chronology</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Correction</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Correction, Addition</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Dance Performance Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Data Paper</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Database Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Discussion</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Early Access</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Editorial Material</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Excerpt</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Fiction, Creative Prose</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Film Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Hardware Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Item About an Individual</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Letter</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Meeting Abstract</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Meeting Summary</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Music Performance Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Music Score</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Music Score Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>News Item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Note</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Poetry</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Proceedings Paper</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Record Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Reprint</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Retracted Publication</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Retraction</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Script</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Software Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>TV Review, Radio Review</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>TV Review, Radio Review Video</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Theater Review</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>保存格式</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxOutputFormat">
+             <item>
+              <property name="text">
+               <string>Plain Text</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Bibtex</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>HTML</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Tab-delimited (Win)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Tab-delimited (Mac)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Tab-delimited (Win, UTF-8)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Tab-delimited (Mac, UTF-8)</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="progressBarDownload">
+         <property name="value">
+          <number>0</number>
+         </property>
+         <property name="textVisible">
+          <bool>true</bool>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="invertedAppearance">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QPushButton" name="pushButtonJournal">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>360</x>
+        <y>40</y>
+        <width>99</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>选择期刊列表</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButtonOutputPath">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>360</x>
+        <y>330</y>
+        <width>99</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>选择保存路径</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButtonStartCrawler">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>460</y>
+        <width>99</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>开始爬取</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Parser</string>
+     </attribute>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>442</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>请选择需要解析的文件格式</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QRadioButton" name="radioButtonPlaintext">
+           <property name="text">
+            <string>Plain Text</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radioButtonBibtex">
+           <property name="text">
+            <string>Bibtex</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radioButtonXML">
+           <property name="text">
+            <string>XML</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLineEdit" name="lineEditParsrInputPath"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonParserInput">
+           <property name="text">
+            <string>选择文件目录</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QPushButton" name="pushButtonParserStart">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>400</y>
+        <width>93</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>开始解析</string>
+      </property>
+     </widget>
+     <widget class="QWidget" name="verticalLayoutWidget_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>120</y>
+        <width>442</width>
+        <height>251</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>请选择解析结果存放形式</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_11">
+         <item>
+          <widget class="QRadioButton" name="radioButtonSQLite">
+           <property name="text">
+            <string>SQLite</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLineEdit" name="lineEditParsrSQLiteOutput"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonParserSQLiteOutput">
+             <property name="text">
+              <string>选择导出目录</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_10">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <item>
+            <widget class="QRadioButton" name="radioButtonMySQL">
+             <property name="text">
+              <string>MySQL</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <widget class="QLabel" name="label_7">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string>主 机 地 址：</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEditParsrMySQLDBAddress">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>localhost</string>
+             </property>
+             <property name="echoMode">
+              <enum>QLineEdit::Normal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <item>
+            <widget class="QLabel" name="label_8">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string>数 据 库 名：</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEditParsrMySQLDBName">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="echoMode">
+              <enum>QLineEdit::Normal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <item>
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>用   户  名：</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEditParsrMySQLUsername">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <item>
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>密       码：</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEditParsrMySQLPassword">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="echoMode">
+              <enum>QLineEdit::Password</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>487</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionWeb_of_Science">
+   <property name="text">
+    <string>Web of Science</string>
+   </property>
+  </action>
+  <action name="actionCNKI">
+   <property name="text">
+    <string>CNKI</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

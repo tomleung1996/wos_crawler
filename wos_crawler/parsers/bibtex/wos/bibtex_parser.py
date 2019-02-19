@@ -18,8 +18,8 @@ def customizations(document):
     return document
 
 
-def parse_single(input_file=None, db_path=None):
-    assert input_file is not None and db_path is not None
+def parse_single(input_file=None, db_path=None, db_url=None):
+    assert input_file is not None and (db_path is not None or db_url is not None)
 
     print('正在解析{}……'.format(input_file))
 
@@ -41,7 +41,7 @@ def parse_single(input_file=None, db_path=None):
     # if len(bib_db.entries) != 500:
     #     exit(-1)
 
-    engine = get_engine(db_path)
+    engine = get_engine(db_path, db_url)
     Base.metadata.create_all(engine)
     session = get_session(engine)
 
@@ -187,13 +187,13 @@ def parse_single(input_file=None, db_path=None):
     print('插入{}完成\n'.format(input_file))
 
 
-def parse(input_dir=None, db_path=None):
-    assert input_dir is not None and db_path is not None
+def parse(input_dir=None, db_path=None, db_url=None):
+    assert input_dir is not None and (db_path is not None or db_url is not None)
 
     for root, dirs, files in os.walk(input_dir):
         for file in files:
             if file[-4:] == '.bib':
-                parse_single(os.path.join(root, file), db_path)
+                parse_single(os.path.join(root, file), db_path, db_url)
 
     print('全部解析完成')
 
