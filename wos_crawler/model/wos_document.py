@@ -10,17 +10,17 @@ class WosDocument(Base):
     unique_id = Column(String(20), primary_key=True)
     title = Column(String(500))
     abs = Column(Text)
-    journal = Column(String(255))
-    journal_iso = Column(String(100))
+    journal = Column(String(255), index=True)
+    journal_iso = Column(String(100), index=True)
     publisher = Column(String(255))
     volume = Column(String(50)) # 有可能有AB卷
     issue = Column(String(10)) # 因为可能有SI：Special Issue，所以是String
     start_page = Column(String(10)) # 因为有可能是电子出版，页码包含E
     end_page = Column(String(10))
-    pub_year = Column(Integer)
+    pub_year = Column(Integer, index=True)
     pub_month_day = Column(String(10))
     document_type = Column(String(50))
-    doi = Column(String(255))
+    doi = Column(String(255), index=True)
     cited_times = Column(Integer)
     reference_num = Column(Integer)
     usage_180 = Column(Integer)
@@ -101,7 +101,7 @@ class WosCategory(Base):
     document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
     document = relationship('WosDocument', back_populates='categories')
 
-    category = Column(String(255))
+    category = Column(String(255), index=True)
 
     def __init__(self, category):
         self.category = category
@@ -112,12 +112,12 @@ class WosCategory(Base):
 class WosResearchArea(Base):
     __tablename__ = 'wos_research_area'
 
-    category_id = Column(Integer, primary_key=True, autoincrement=True)
+    area_id = Column(Integer, primary_key=True, autoincrement=True)
 
     document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
     document = relationship('WosDocument', back_populates='research_areas')
 
-    area = Column(String(255))
+    area = Column(String(255), index=True)
 
     def __init__(self, area):
         self.area = area
@@ -134,7 +134,7 @@ class WosKeyword(Base):
     document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
     document = relationship('WosDocument', back_populates='keywords')
 
-    keyword = Column(String(255))
+    keyword = Column(String(255), index=True)
 
     def __init__(self, keyword):
         self.keyword = keyword
@@ -169,11 +169,11 @@ class WosReference(Base):
     document = relationship('WosDocument', back_populates='references')
 
     first_author = Column(String(255))
-    pub_year = Column(Integer)
-    journal = Column(String(255))
+    pub_year = Column(Integer, index=True)
+    journal = Column(String(255), index=True)
     volume = Column(String(50)) # 有可能有AB卷
     start_page = Column(String(100)) #因为有电子出版的可能，所以有可能是E开头
-    doi = Column(String(255))
+    doi = Column(String(255), index=True)
 
     def __init__(self, first_author, pub_year, journal, volume, start_page, doi):
         self.first_author = first_author

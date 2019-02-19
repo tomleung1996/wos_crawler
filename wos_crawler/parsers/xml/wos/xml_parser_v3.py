@@ -4,6 +4,9 @@ import xml.etree.ElementTree as ET
 import os
 import time
 
+global AUTHOR_ID
+AUTHOR_ID = 1
+
 
 def parse_single(input_file=None, db_path=None):
     assert input_file is not None and db_path is not None
@@ -58,37 +61,38 @@ def parse_single(input_file=None, db_path=None):
                 wos_document.language = get_language(record)
 
                 # print(wos_document)
+                uid = wos_document.unique_id
 
                 authors = record.find('./static_data/summary/names')
-                wos_document.authors = get_authors(authors, record)
+                wos_document.authors = get_authors(authors, record, uid)
 
                 # print(wos_document.authors)
 
                 references = record.find('./static_data/fullrecord_metadata/references')
-                wos_document.references = get_references(references)
+                wos_document.references = get_references(references, uid)
 
                 # print(wos_document.references)
 
                 categories = record.findall(
                     './static_data/fullrecord_metadata/category_info/subjects/subject[@ascatype="traditional"]')
-                wos_document.categories = get_categories(categories)
+                wos_document.categories = get_categories(categories, uid)
                 # print(wos_document.categories)
 
                 areas = record.findall(
                     './static_data/fullrecord_metadata/category_info/subjects/subject[@ascatype="extended"]')
-                wos_document.research_areas = get_research_areas(areas)
+                wos_document.research_areas = get_research_areas(areas, uid)
                 # print(wos_document.research_areas)
 
                 keywords = record.find('./static_data/fullrecord_metadata/keywords')
-                wos_document.keywords = get_keywords(keywords)
+                wos_document.keywords = get_keywords(keywords, uid)
                 # print(wos_document.keywords)
 
                 keyword_plus = record.find('./static_data/item/keywords_plus')
-                wos_document.keyword_plus = get_keyword_plus(keyword_plus)
+                wos_document.keyword_plus = get_keyword_plus(keyword_plus, uid)
                 # print(wos_document.keyword_plus)
 
                 fundings = record.find('./static_data/fullrecord_metadata/fund_ack/grants')
-                wos_document.fundings = get_fundings(fundings)
+                wos_document.fundings = get_fundings(fundings, uid)
                 # print(wos_document.fundings)
 
                 wos_document_list.append(wos_document)
@@ -96,7 +100,11 @@ def parse_single(input_file=None, db_path=None):
                 # 及时写入清空队列
                 if len(wos_document_list) > 499:
                     print('缓存队列达到阈值，正在写入数据库……', end='')
-                    session.add_all(wos_document_list)
+                    # session.add_all(wos_document_list)
+
+                    # 使用底层批量插入方法提高速度
+                    bulk_save(session, wos_document_list)
+
                     session.commit()
                     print(' 完成 - {}秒'.format(time.time() - start))
                     wos_document_list.clear()
@@ -108,7 +116,9 @@ def parse_single(input_file=None, db_path=None):
                 single_record += line
 
     print('解析{}完成，正在写入数据库……'.format(input_file))
-    session.add_all(wos_document_list)
+    # session.add_all(wos_document_list)
+    bulk_save(session, wos_document_list)
+
     session.commit()
     session.close()
     print('插入{}完成\n'.format(input_file))
@@ -250,7 +260,7 @@ def get_language(record):
         return None
 
 
-def get_authors(authors, record):
+def get_authors(authors, record, uid):
     author_list = []
     author_dict = {}
     if authors is not None:
@@ -279,6 +289,12 @@ def get_authors(authors, record):
                 last_name = full_name
 
             wos_author = WosAuthor(first_name, last_name, author_order, is_reprint)
+            wos_author.document_unique_id = uid
+
+            global AUTHOR_ID
+            wos_author.author_id = AUTHOR_ID
+            AUTHOR_ID += 1
+
             author_dict[full_name] = wos_author
 
     if len(author_dict) > 0:
@@ -289,7 +305,7 @@ def get_authors(authors, record):
     return author_list
 
 
-def get_references(references):
+def get_references(references, uid):
     reference_list = []
     if references is not None:
         for reference in references:
@@ -340,43 +356,48 @@ def get_references(references):
                     doi = None
 
             wos_reference = WosReference(first_author, pub_year, journal, volume, start_page, doi)
+            wos_reference.document_unique_id = uid
             reference_list.append(wos_reference)
 
     return reference_list
 
 
-def get_categories(categories):
+def get_categories(categories, uid):
     category_list = []
     if categories is not None:
         for category in categories:
             wos_category = WosCategory(category.text.lower())
+            wos_category.document_unique_id = uid
             category_list.append(wos_category)
     return category_list
 
 
-def get_research_areas(areas):
+def get_research_areas(areas, uid):
     areas_list = []
     if areas is not None:
         for area in areas:
             wos_area = WosResearchArea(area.text.lower())
+            wos_area.document_unique_id = uid
             areas_list.append(wos_area)
     return areas_list
 
 
-def get_keywords(keywords):
+def get_keywords(keywords, uid):
     keyword_list = []
     if keywords is not None:
         for keyword in keywords:
             wos_keyword = WosKeyword(keyword.text.lower())
+            wos_keyword.document_unique_id = uid
             keyword_list.append(wos_keyword)
     return keyword_list
 
 
-def get_keyword_plus(keyword_plus):
+def get_keyword_plus(keyword_plus, uid):
     kp_list = []
     if keyword_plus is not None:
         for kp in keyword_plus:
             wos_kp = WosKeywordPlus(kp.text.lower())
+            wos_kp.document_unique_id = uid
             kp_list.append(wos_kp)
     return kp_list
 
@@ -395,11 +416,12 @@ def get_affiliations(addresses, author_dict):
 
             wos_affiliation = WosAffiliation(address_name)
             wos_affiliation.author = author_dict[full_name]
+            wos_affiliation.author_id = wos_affiliation.author.author_id
 
     return author_dict
 
 
-def get_fundings(fundings):
+def get_fundings(fundings, uid):
     funding_list = []
     if fundings is not None:
         for funding in fundings:
@@ -413,11 +435,41 @@ def get_fundings(fundings):
             if numbers is not None:
                 for number in numbers:
                     wos_funding = WosFunding(agent, number.text.lower())
-                    funding_list.append(wos_funding)
             else:
                 wos_funding = WosFunding(agent, None)
-                funding_list.append(wos_funding)
+            wos_funding.document_unique_id = uid
+            funding_list.append(wos_funding)
     return funding_list
+
+
+def bulk_save(session, wos_document_list):
+    session.bulk_save_objects(wos_document_list)
+
+    all_authors = [wos_author for wos_doc in wos_document_list for wos_author in wos_doc.authors]
+    session.bulk_save_objects(all_authors)
+
+    all_affiliations = [wos_affiliation for wos_author in all_authors for wos_affiliation in
+                        wos_author.affiliations]
+    session.bulk_save_objects(all_affiliations)
+
+    all_references = [wos_reference for wos_doc in wos_document_list for wos_reference in
+                      wos_doc.references]
+    session.bulk_save_objects(all_references)
+
+    all_keywords = [wos_keyword for wos_doc in wos_document_list for wos_keyword in wos_doc.keywords]
+    session.bulk_save_objects(all_keywords)
+
+    all_kp = [wos_kp for wos_doc in wos_document_list for wos_kp in wos_doc.keyword_plus]
+    session.bulk_save_objects(all_kp)
+
+    all_categories = [wos_cat for wos_doc in wos_document_list for wos_cat in wos_doc.categories]
+    session.bulk_save_objects(all_categories)
+
+    all_areas = [wos_area for wos_doc in wos_document_list for wos_area in wos_doc.research_areas]
+    session.bulk_save_objects(all_areas)
+
+    all_fundings = [wos_funding for wos_doc in wos_document_list for wos_funding in wos_doc.fundings]
+    session.bulk_save_objects(all_fundings)
 
 
 def parse(input_dir=None, db_path=None):
@@ -432,5 +484,5 @@ def parse(input_dir=None, db_path=None):
 
 
 if __name__ == '__main__':
-    parse(input_dir=r'C:\Users\Tom\PycharmProjects\wos_crawler\input\test',
+    parse(input_dir=r'C:\Users\Tom\Desktop\test\1',
           db_path='C:/Users/Tom/Desktop/test-xml.db')

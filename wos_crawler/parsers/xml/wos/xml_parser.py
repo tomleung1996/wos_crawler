@@ -268,11 +268,15 @@ def get_references(name_space, references):
             if pub_year is not None:
                 if pub_year.text is not None:
                     pub_year = pub_year.text.lower()
+                    if len(pub_year) > 4:
+                        pub_year = pub_year[:4]
                 else:
                     pub_year = None
             if journal is not None:
                 if journal.text is not None:
                     journal = journal.text.replace('.', '').lower()
+                    if len(journal) > 254:
+                        journal = journal[:254]
                 else:
                     journal = None
             if volume is not None:
