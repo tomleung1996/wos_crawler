@@ -33,5 +33,5 @@ if __name__ == '__main__':
     #                output_path='../output', output_format='bibtex', document_type='proceedings paper')
 
     # 使用GUI下载
-    # crawl_by_gui()
+    crawl_by_gui()
     pass
