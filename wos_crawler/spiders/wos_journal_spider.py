@@ -103,7 +103,7 @@ class WosJournalSpiderSpider(scrapy.Spider):
         # 提交post高级搜索请求
         adv_search_url = 'http://apps.webofknowledge.com/WOS_AdvancedSearch.do'
         #检索式，目前设定为期刊，稍作修改可以爬取任意检索式
-        query = 'SO={}'.format(journal_name.upper())
+        query = 'SO="{}"'.format(journal_name.upper())
 
         query_form = {
             "product": "WOS",

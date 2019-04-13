@@ -74,7 +74,7 @@ class WosAuthor(Base):
 
     author_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id', ondelete='cascade', onupdate='cascade'))
     document = relationship('WosDocument', back_populates='authors')
 
     last_name = Column(String(255))
@@ -98,7 +98,7 @@ class WosCategory(Base):
 
     category_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id', ondelete='cascade', onupdate='cascade'))
     document = relationship('WosDocument', back_populates='categories')
 
     category = Column(String(255), index=True)
@@ -114,7 +114,7 @@ class WosResearchArea(Base):
 
     area_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id', ondelete='cascade', onupdate='cascade'))
     document = relationship('WosDocument', back_populates='research_areas')
 
     area = Column(String(255), index=True)
@@ -131,7 +131,7 @@ class WosKeyword(Base):
 
     keyword_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id', ondelete='cascade', onupdate='cascade'))
     document = relationship('WosDocument', back_populates='keywords')
 
     keyword = Column(String(255), index=True)
@@ -148,7 +148,7 @@ class WosKeywordPlus(Base):
 
     keyword_plus_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id', ondelete='cascade', onupdate='cascade'))
     document = relationship('WosDocument', back_populates='keyword_plus')
 
     keyword_plus = Column(String(255))
@@ -165,7 +165,7 @@ class WosReference(Base):
 
     reference_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id', ondelete='cascade', onupdate='cascade'))
     document = relationship('WosDocument', back_populates='references')
 
     first_author = Column(String(255))
@@ -194,7 +194,7 @@ class WosAffiliation(Base):
 
     affiliation_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    author_id = Column(Integer, ForeignKey('wos_author.author_id'))
+    author_id = Column(Integer, ForeignKey('wos_author.author_id', ondelete='cascade', onupdate='cascade'))
     author = relationship('WosAuthor', back_populates='affiliations')
 
     address = Column(String(500))
@@ -211,7 +211,7 @@ class WosFunding(Base):
 
     funding_id = Column(Integer, primary_key=True, autoincrement=True)
 
-    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id'))
+    document_unique_id = Column(String(20), ForeignKey('wos_document.unique_id', ondelete='cascade', onupdate='cascade'))
     document = relationship('WosDocument', back_populates='fundings')
 
     agent = Column(String(500))
