@@ -266,7 +266,10 @@ class WosJournalSpiderSpider(scrapy.Spider):
 
         #按期刊名称保存文件
 
-        filename = self.output_path_prefix + '/journal/{}/{}.{}'.format(journal_name, journal_name + '-' + str(start) + '-' + str(end), file_postfix)
+        filename = self.output_path_prefix + '/journal/{}/{}/{}.{}'.format(self.timestamp,
+                                                                           journal_name,
+                                                                           journal_name + '-' + str(start) + '-' + str(end),
+                                                                           file_postfix)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         text = response.text
 
@@ -295,12 +298,12 @@ class WosJournalSpiderSpider(scrapy.Spider):
         # 等到全部爬取完成后再解析并导入数据库
         if spider.output_format == 'bibtex':
             print('爬取完成，开始导入数据库(bibtex)')
-            bibtex_parser.parse(input_dir=spider.output_path_prefix + '/advanced_query/{}'.format(spider.timestamp),
-                                db_path=spider.output_path_prefix + '/advanced_query/{}/result.db'.format(
+            bibtex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
+                                db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
                                     spider.timestamp))
         elif spider.output_format == 'fieldtagged':
             print('爬取完成，开始导入数据库(fieldtagged/plaintext)')
-            plaintex_parser.parse(input_dir=spider.output_path_prefix + '/advanced_query/{}'.format(spider.timestamp),
-                                  db_path=spider.output_path_prefix + '/advanced_query/{}/result.db'.format(
+            plaintex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
+                                  db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
                                       spider.timestamp))
 
