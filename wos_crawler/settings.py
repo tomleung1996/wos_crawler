@@ -14,6 +14,7 @@ LOG_LEVEL = 'ERROR'
 SPIDER_MODULES = ['wos_crawler.spiders']
 NEWSPIDER_MODULE = 'wos_crawler.spiders'
 
+RETRY_HTTP_CODES = [500, 502, 503, 504, 408]
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
@@ -57,7 +58,7 @@ DEFAULT_REQUEST_HEADERS = {
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   'scrapy.downloadermiddlewares.retry.RetryMiddleware': 543,
+   'scrapy.downloadermiddlewares.retry.RetryMiddleware': 100,
 }
 
 # Enable or disable extensions
