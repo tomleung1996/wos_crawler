@@ -37,7 +37,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
 
     output_path_prefix = ''
 
-    def __init__(self, query = None, output_path = '../output', document_type='Article',output_format = 'bibtex',gui=None, *args, **kwargs):
+    def __init__(self, query = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged',gui=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.query = query
         self.output_path_prefix = output_path
