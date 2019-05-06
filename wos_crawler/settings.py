@@ -14,6 +14,8 @@ LOG_LEVEL = 'ERROR'
 SPIDER_MODULES = ['wos_crawler.spiders']
 NEWSPIDER_MODULE = 'wos_crawler.spiders'
 
+RETRY_ENABLED = True
+RETRY_TIMES = 10
 RETRY_HTTP_CODES = [500, 502, 503, 504, 408]
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -23,12 +25,13 @@ RETRY_HTTP_CODES = [500, 502, 503, 504, 408]
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+# CONCURRENT_REQUESTS = 1
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
 # DOWNLOAD_DELAY = 1
+DOWNLOAD_TIMEOUT = 60
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -45,7 +48,7 @@ DEFAULT_REQUEST_HEADERS = {
   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
   'Accept-Encoding': 'gzip, deflate',
   'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7,zh-TW;q=0.6',
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+  'User-Agent': 'Mozilla/5.0 (Windows NT 5.1; U; en; rv:1.8.1) Gecko/20061208 Firefox/2.0.0 Opera 9.50',
   'Connection': 'keep-alive'
 }
 
@@ -69,9 +72,9 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-   'wos_crawler.pipelines.parse_and_store_pipeline.ParseAndStorePipeline': 300,
-}
+# ITEM_PIPELINES = {
+#    'wos_crawler.pipelines.parse_and_store_pipeline.ParseAndStorePipeline': 300,
+# }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

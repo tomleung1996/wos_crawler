@@ -30,15 +30,21 @@ def parse_single(input_file=None, db_path=None, db_url=None):
 
     with open(input_file, mode='r', encoding='utf-8') as file:
         single_record = ''
+        i = 0
         for line in file:
+            i += 1
             if '<REC' in line:
+                print(i)
                 single_record = line
             elif '</REC>' in line:
                 single_record += line
 
                 start = time.time()
 
-                record = ET.fromstring(single_record)
+                # 新增改动
+                parser = ET.XMLParser(encoding='utf-8')
+
+                record = ET.fromstring(single_record, parser=parser)
 
                 wos_document = WosDocument()
 
@@ -484,5 +490,8 @@ def parse(input_dir=None, db_path=None, db_url=None):
 
 
 if __name__ == '__main__':
-    parse(input_dir=r'C:\Users\Tom\Desktop\test\1',
-          db_path='C:/Users/Tom/Desktop/test-xml.db')
+    # parse(input_dir=r'C:\Users\Tom\Desktop\test\1',
+    #       db_path='C:/Users/Tom/Desktop/test-xml.db')
+
+    parse(input_dir=r'C:\Users\Tom\Desktop\test\4',
+          db_url='mysql+pymysql://root:root@localhost/contest?charset=utf8')

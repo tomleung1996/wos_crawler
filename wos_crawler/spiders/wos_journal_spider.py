@@ -197,7 +197,7 @@ class WosJournalSpiderSpider(scrapy.Spider):
         soup = BeautifulSoup(response.text, 'lxml')
         paper_num = int(soup.find('span', attrs={'id': 'footer_formatted_count'}).get_text().replace(',', ''))
         span = 500
-        iter_num = paper_num // span + 1
+        iter_num = paper_num // span + (1 if paper_num % span != 0 else 0)
 
         #对每一批次的结果进行导出（500一批）
         print('{} 有{}条文献需要下载'.format(journal_name, paper_num))

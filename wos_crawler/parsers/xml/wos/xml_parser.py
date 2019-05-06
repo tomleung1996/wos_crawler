@@ -383,5 +383,5 @@ def parse(input_dir=None, db_path=None, db_url=None):
 
 
 if __name__ == '__main__':
-    parse(input_dir=r'C:\Users\Tom\Desktop\test',
-          db_path='C:/Users/Tom/Desktop/test-xml.db')
+    parse(input_dir=r'C:\Users\Tom\Desktop\test\3',
+          db_url='mysql+pymysql://root:root@localhost/contest')

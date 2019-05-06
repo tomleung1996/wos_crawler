@@ -12,7 +12,7 @@ from gui.tab_gui_crawler import *
 from scrapy.utils.project import get_project_settings
 from scrapy.crawler import CrawlerRunner
 from spiders.wos_advanced_query_spider import WosAdvancedQuerySpiderSpider
-from spiders.wos_journal_spider import WosJournalSpiderSpider
+from spiders.wos_journal_spider_v2 import WosJournalSpiderV2Spider
 import parsers.plaintext.wos.plaintex_parser
 import parsers.bibtex.wos.bibtex_parser
 import parsers.xml.wos.xml_parser_v3
@@ -134,7 +134,7 @@ class GuiCrawler(QMainWindow):
             journal_list_path = self.ui.lineEditJournal.text()
             print('期刊列表存放路径为：' + journal_list_path)
             print('正在调用WosJournalSpider进行爬取……')
-            d = crawler.crawl(WosJournalSpiderSpider, journal_list_path, output_path, document_type, output_format,
+            d = crawler.crawl(WosJournalSpiderV2Spider, journal_list_path, output_path, document_type, output_format,
                               self)
 
         elif self.ui.radioButtonQuery.isChecked():
