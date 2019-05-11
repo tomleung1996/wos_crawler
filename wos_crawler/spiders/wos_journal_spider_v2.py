@@ -213,7 +213,7 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         # 处理超过10万文献的期刊
         if paper_num >= 100000:
             print('{}文献数量超过10万（{}），跳过爬取\n'.format(journal_name, paper_num))
-            filename = self.output_path_prefix + '/journal/{}/{}/'.format(self.timestamp, '100K-' + journal_name)
+            filename = self.output_path_prefix + '/journal/{}/'.format('100K-' + journal_name)
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             yield Request(self.start_urls[0], method='GET', callback=self.parse, dont_filter=True)
             return

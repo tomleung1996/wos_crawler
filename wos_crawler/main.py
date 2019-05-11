@@ -23,12 +23,12 @@ def crawl_by_gui():
 
 if __name__ == '__main__':
     # 按期刊下载
-    # crawl_by_journal_v2(journal_list_path=r'C:\Users\Tom\PycharmProjects\wos_crawler\input\journal_list_test.txt',
-    #                  output_path='../output', output_format='fieldtagged', document_type='')
+    crawl_by_journal(journal_list_path=r'C:\Users\Tom\PycharmProjects\wos_crawler\input\journal_list_test.txt',
+                     output_path=r'D:\wos爬取结果', output_format='fieldtagged', document_type='')
 
     # 按检索式下载
-    # crawl_by_query(query='TS="information science" AND PY=(2010-2018)',
-                   # output_path='../output', output_format='fieldtagged', document_type='')
+    # crawl_by_query(query='SO="CELL MOL LIFE SCI" AND PY=(1900-2018)',
+    #                output_path='../output', output_format='fieldtagged', document_type='')
 
     # 使用GUI下载
     # crawl_by_gui()
