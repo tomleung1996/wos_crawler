@@ -68,6 +68,8 @@ def parse_single(input_file=None, db_path=None, db_url=None):
                                        if 'booktitle' in bib_db.entries[i] else None,
                                        bib_db.entries[i]['journal-iso'][1:-1].lower().replace('\\', '')
                                        if 'journal-iso' in bib_db.entries[i] else None,
+                                       # bibtex格式不存在29字符格式的期刊缩写
+                                       None,
                                        bib_db.entries[i]['publisher'][1:-1].lower().replace('\\', '')
                                        if 'publisher' in bib_db.entries[i] else None,
                                        bib_db.entries[i]['volume'][1:-1].lower()
@@ -117,7 +119,8 @@ def parse_single(input_file=None, db_path=None, db_url=None):
             for author_info, addresses in bib_db.entries[i]['affiliation'].items():
 
                 affiliation_list = []
-                author = WosAuthor(author_info[0], author_info[1], author_info[2], author_info[3])
+                # bibtex格式无法找到规范缩写
+                author = WosAuthor(author_info[0], author_info[1], None,author_info[2], author_info[3])
                 session.add(author)
                 session.flush()
 

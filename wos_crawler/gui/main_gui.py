@@ -12,7 +12,7 @@ from gui.tab_gui_crawler import *
 from scrapy.utils.project import get_project_settings
 from scrapy.crawler import CrawlerRunner
 from spiders.wos_advanced_query_spider import WosAdvancedQuerySpiderSpider
-from spiders.wos_journal_spider import WosJournalSpiderSpider
+from spiders.wos_journal_spider_v2 import WosJournalSpiderV2Spider
 import parsers.plaintext.wos.plaintex_parser
 import parsers.bibtex.wos.bibtex_parser
 import parsers.xml.wos.xml_parser_v3
@@ -117,6 +117,10 @@ class GuiCrawler(QMainWindow):
         print('保存格式：' + output_format)
         if output_format == 'Plain Text':
             output_format = 'fieldtagged'
+        elif output_format == 'Bibtex':
+            output_format = 'bibtex'
+        elif output_format == 'HTML':
+            output_format = 'html'
         elif output_format == 'Tab-delimited (Win)':
             output_format = 'tabWinUnicode'
         elif output_format == 'Tab-delimited (Mac)':
@@ -125,7 +129,7 @@ class GuiCrawler(QMainWindow):
             output_format = 'tabWinUTF8'
         elif output_format == 'Tab-delimited (Mac, UTF-8)':
             output_format = 'tabMacUTF8'
-        output_format = output_format.lower()
+        # output_format = output_format.lower()
 
         # 需要注意，此处使用了CrawlerRunner，以便scrapy与GUI在同一个进程中异步进行
         crawler = CrawlerRunner(get_project_settings())
@@ -134,7 +138,7 @@ class GuiCrawler(QMainWindow):
             journal_list_path = self.ui.lineEditJournal.text()
             print('期刊列表存放路径为：' + journal_list_path)
             print('正在调用WosJournalSpider进行爬取……')
-            d = crawler.crawl(WosJournalSpiderSpider, journal_list_path, output_path, document_type, output_format,
+            d = crawler.crawl(WosJournalSpiderV2Spider, journal_list_path, output_path, document_type, output_format,
                               self)
 
         elif self.ui.radioButtonQuery.isChecked():
