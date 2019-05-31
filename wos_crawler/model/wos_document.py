@@ -11,7 +11,8 @@ class WosDocument(Base):
     title = Column(String(500))
     abs = Column(Text)
     journal = Column(String(255), index=True)
-    journal_iso = Column(String(100), index=True)
+    journal_iso = Column(String(100))
+    journal_29 = Column(String(50), index=True)
     publisher = Column(String(255))
     volume = Column(String(50)) # 有可能有AB卷
     issue = Column(String(10)) # 因为可能有SI：Special Issue，所以是String
@@ -38,7 +39,7 @@ class WosDocument(Base):
     references = relationship('WosReference', back_populates='document')
     fundings = relationship('WosFunding', back_populates='document')
 
-    def __init__(self, unique_id=None, title=None, abs=None, journal=None, journal_iso=None, publisher=None,
+    def __init__(self, unique_id=None, title=None, abs=None, journal=None, journal_iso=None, journal_29=None,publisher=None,
                  volume=None, issue=None, start_page=None,end_page=None,pub_year=None, pub_month_day=None, document_type=None,
                  doi=None, cited_times=None, reference_num=None, usage_180=None, usage_since_2013=None,
                  funding_text=None, language=None, author_email=None):
@@ -47,6 +48,7 @@ class WosDocument(Base):
         self.abs = abs
         self.journal = journal
         self.journal_iso = journal_iso
+        self.journal_29 = journal_29
         self.publisher = publisher
         self.volume = volume
         self.issue = issue
@@ -79,13 +81,15 @@ class WosAuthor(Base):
 
     last_name = Column(String(255))
     first_name = Column(String(255))
+    abbr_name = Column(String(255))
     author_order = Column(Integer)
     is_reprint_author = Column(Integer)
     affiliations = relationship('WosAffiliation', back_populates='author')
 
-    def __init__(self, first_name, last_name, author_order, is_reprint_author):
+    def __init__(self, first_name, last_name, abbr_name,author_order, is_reprint_author):
         self.first_name = first_name
         self.last_name = last_name
+        self.abbr_name = abbr_name
         self.author_order = author_order
         self.is_reprint_author = is_reprint_author
 

@@ -53,6 +53,7 @@ def parse_single(input_file=None, db_path=None, db_url=None):
                 wos_document.abs = get_abs(record)
                 wos_document.journal = get_journal(record)
                 wos_document.journal_iso = get_journal_iso(record)
+                wos_document.journal_29 = get_journal_29(record)
                 wos_document.publisher = get_publisher(record)
                 wos_document.volume = get_volume(record)
                 wos_document.issue = get_issue(record)
@@ -166,6 +167,13 @@ def get_journal_iso(record):
     # 找到期刊ISO缩写
     try:
         return record.find('./static_data/summary/titles/title[@type="abbrev_iso"]').text.lower()
+    except:
+        return None
+
+def get_journal_29(record):
+    # 找到期刊29字符缩写
+    try:
+        return record.find('./static_data/summary/titles/title[@type="abbrev_29"]').text.lower()
     except:
         return None
 
@@ -289,12 +297,14 @@ def get_authors(authors, record, uid):
             try:
                 first_name = author.find('./first_name').text.lower()
                 last_name = author.find('./last_name').text.lower()
+                abbr_name = author.find('./wos_standard').text.lower().replace(',','')
             except:
                 # 团体作者只有fullname
                 first_name = None
                 last_name = full_name
+                abbr_name = full_name
 
-            wos_author = WosAuthor(first_name, last_name, author_order, is_reprint)
+            wos_author = WosAuthor(first_name, last_name, abbr_name,author_order, is_reprint)
             wos_author.document_unique_id = uid
 
             global AUTHOR_ID

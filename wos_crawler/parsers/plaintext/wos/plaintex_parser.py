@@ -68,14 +68,14 @@ def parse_single(input_file=None, db_path=None, db_url=None):
                         pos = full_name.index(' ')
                     except:
                         pos = len(full_name)
-                author = WosAuthor(full_name[pos + 1:], full_name[:pos], author_order, 0)
+                author = WosAuthor(full_name[pos + 1:], full_name[:pos], initials_list[author_order-1].replace(',',''),author_order, 0)
                 author.document = wos_document
                 author_dict[full_name] = author
                 author_order += 1
             elif cur_field == 'ca ':
                 group_author = line[3:]
                 initials_list.append(group_author)
-                author = WosAuthor(group_author, None, author_order, 0)
+                author = WosAuthor(group_author, None, initials_list[author_order-1].replace(',',''), author_order, 0)
                 author_dict[group_author] = author
                 author_order += 1
             elif cur_field == 'c1 ':
@@ -244,6 +244,8 @@ def parse_single(input_file=None, db_path=None, db_url=None):
                 wos_document.publisher = line[3:]
             elif cur_field == 'ji ':
                 wos_document.journal_iso = line[3:]
+            elif cur_field == 'j9 ':
+                wos_document.journal_29 = line[3:]
             elif cur_field == 'pd ':
                 wos_document.pub_month_day = line[3:]
             elif cur_field == 'py ':

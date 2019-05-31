@@ -117,6 +117,10 @@ class GuiCrawler(QMainWindow):
         print('保存格式：' + output_format)
         if output_format == 'Plain Text':
             output_format = 'fieldtagged'
+        elif output_format == 'Bibtex':
+            output_format = 'bibtex'
+        elif output_format == 'HTML':
+            output_format = 'html'
         elif output_format == 'Tab-delimited (Win)':
             output_format = 'tabWinUnicode'
         elif output_format == 'Tab-delimited (Mac)':
@@ -125,7 +129,7 @@ class GuiCrawler(QMainWindow):
             output_format = 'tabWinUTF8'
         elif output_format == 'Tab-delimited (Mac, UTF-8)':
             output_format = 'tabMacUTF8'
-        output_format = output_format.lower()
+        # output_format = output_format.lower()
 
         # 需要注意，此处使用了CrawlerRunner，以便scrapy与GUI在同一个进程中异步进行
         crawler = CrawlerRunner(get_project_settings())

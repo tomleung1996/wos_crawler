@@ -12,7 +12,7 @@ from parsers.plaintext.wos import plaintex_parser
 
 
 class WosJournalSpiderV2Spider(scrapy.Spider):
-    name = 'wos_journal_spider_v2'
+    name = 'wos_journal_10k_spider'
     allowed_domains = ['webofknowledge.com']
     start_urls = ['http://www.webofknowledge.com/']
     timestamp = str(time.strftime('%Y-%m-%d-%H.%M.%S', time.localtime(time.time())))
@@ -55,7 +55,11 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
 
         with open(self.JOURNAL_LIST_PATH) as file:
             for row in file:
-                self.JOURNAL_LIST.append(row.strip().replace('\n', '').upper())
+                # 策略一，手动分年份（对plos one可能需要逐年爬取）
+                self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '1900-1990'))
+                self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '1991-2000'))
+                self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '2001-2010'))
+                self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '2011-2018'))
 
         self.JOURNAL_LIST.sort()
         self.total_paper_num = 0
@@ -89,16 +93,16 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
 
         # 获得当前要爬取的期刊名称
         # journal_name = self.JOURNAL_LIST.pop(0)
-        for journal_name in self.JOURNAL_LIST:
+        for journal_name, year in self.JOURNAL_LIST:
             i = int(time.time())
             # 获取SID
             pattern = re.compile(self.sid_pattern)
             result = re.search(pattern, response.url)
             if result is not None:
                 sid = result.group(1)
-                print('\033[1;30;47m {} \033[0m 提取得到SID：'.format(journal_name), result.group(1))
+                print('\033[1;30;47m {} \033[0m 提取得到SID：'.format(journal_name + ' ' + year), result.group(1))
             else:
-                print('\033[1;30;47m {} \033[0m SID提取失败'.format(journal_name))
+                print('\033[1;30;47m {} \033[0m SID提取失败'.format(journal_name + ' ' + year))
                 sid = None
                 exit(-1)
 
@@ -114,7 +118,7 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
             # 提交post高级搜索请求
             adv_search_url = 'http://apps.webofknowledge.com/WOS_AdvancedSearch.do'
             # 检索式，目前设定为期刊，稍作修改可以爬取任意检索式
-            query = 'SO="{}" AND PY=(1900-2018)'.format(journal_name.upper())
+            query = 'SO="{}" AND PY=({})'.format(journal_name.upper(), year)
 
             query_form = {
                 "product": "WOS",
@@ -152,7 +156,7 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
             # 同时通过meta参数为下一个处理函数传递sid、journal_name等有用信息
             return FormRequest(adv_search_url, method='POST', formdata=query_form, dont_filter=True,
                                callback=self.parse_result_entry,
-                               meta={'sid': sid, 'journal_name': journal_name, 'query': query})
+                               meta={'sid': sid, 'journal_name': journal_name, 'query': query, 'year':year})
 
         # 一个检索式爬取完成后，yield一个新的Request，相当于一个尾递归实现的循环功能，
         # 好处是每个检索式都是用不同的SID来爬取的
@@ -167,6 +171,7 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         """
         sid = response.meta['sid']
         journal_name = response.meta['journal_name']
+        year = response.meta['year']
         query = response.meta['query']
         # cookiejar = response.meta['cookiejar']
 
@@ -185,18 +190,19 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         result = re.search(pattern, entry_url)
         if result is not None:
             qid = result.group(1)
-            print('\033[1;30;47m {} \033[0m 提取得到qid：'.format(journal_name), result.group(1))
+            print('\033[1;30;47m {} \033[0m 提取得到qid：'.format(journal_name + ' ' + year), result.group(1))
         else:
-            print('\033[1;30;47m {} \033[0m qid提取失败'.format(journal_name))
+            print('\033[1;30;47m {} \033[0m qid提取失败'.format(journal_name + ' ' + year))
             exit(-1)
 
         # yield一个Request给parse_result，让它去处理搜索结果页面，同时用meta传递有用参数
         return Request(entry_url, callback=self.parse_results,
-                       meta={'sid': sid, 'journal_name': journal_name, 'query': query, 'qid': qid})
+                       meta={'sid': sid, 'journal_name': journal_name, 'query': query, 'qid': qid, 'year':year})
 
     def parse_results(self, response):
         sid = response.meta['sid']
         journal_name = response.meta['journal_name']
+        year = response.meta['year']
         query = response.meta['query']
         qid = response.meta['qid']
         # cookiejar = response.meta['cookiejar']
@@ -213,7 +219,7 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         # 处理超过10万文献的期刊
         if paper_num >= 100000:
             print('{}文献数量超过10万（{}），跳过爬取\n'.format(journal_name, paper_num))
-            filename = self.output_path_prefix + '/journal/{}-{}/'.format('100K-' + journal_name, paper_num)
+            filename = self.output_path_prefix + '/journal/{}-{}/'.format('100K-' + journal_name + ' ' + year, paper_num)
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             yield Request(self.start_urls[0], method='GET', callback=self.parse, dont_filter=True)
             return
@@ -223,14 +229,14 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         self.COUNT = 0
 
         # 对每一批次的结果进行导出（500一批）
-        print('{} 有{}条文献需要下载'.format(journal_name, paper_num))
+        print('{} 有{}条文献需要下载'.format(journal_name + ' ' + year, paper_num))
         self.total_paper_num += paper_num
         for i in range(1, iter_num + 1):
             end = i * span
             start = (i - 1) * span + 1
             if end > paper_num:
                 end = paper_num
-            print('\t正在下载 {} 的第 {} 到第 {} 条文献'.format(journal_name, start, end))
+            print('\t正在下载 {} 的第 {} 到第 {} 条文献'.format(journal_name + ' ' + year, start, end))
             output_form = {
                 "selectedIds": "",
                 "displayCitedRefs": "true",
@@ -269,7 +275,7 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
                               callback=self.download_result,
                               meta={'sid': sid, 'journal_name': journal_name, 'query': query, 'qid': qid,
                                     'start': start, 'end': end, 'iter_num': iter_num,
-                                    'paper_num':paper_num},
+                                    'paper_num':paper_num, 'year':year},
                               priority=paper_num - start)
 
     def download_result(self, response):
@@ -284,6 +290,7 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
 
         sid = response.meta['sid']
         journal_name = response.meta['journal_name']
+        year = response.meta['year']
         query = response.meta['query']
         qid = response.meta['qid']
         start = response.meta['start']
@@ -299,7 +306,7 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         #                                                                    journal_name + '-' + str(start) + '-' + str(
         #                                                                        end),
         #                                                                    file_postfix)
-        filename = self.output_path_prefix + '/journal/{}/{}.{}'.format(journal_name + '-' + str(paper_num),
+        filename = self.output_path_prefix + '/journal/{}/{}.{}'.format(journal_name + ' ' + year + '-' + str(paper_num),
                                                                            journal_name + '-' + str(start) + '-' + str(
                                                                                end),
                                                                            file_postfix)
@@ -326,15 +333,15 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
             print('\033[1;30;47m {} \033[0m 最后一个文件下载完成，开始爬取下一本期刊\n'.format(journal_name))
             return Request(self.start_urls[0], method='GET', callback=self.parse, dont_filter=True)
 
-    def close(spider, reason):
-        # 等到全部爬取完成后再解析并导入数据库
-        if spider.output_format == 'bibtex':
-            print('爬取完成，开始导入数据库(bibtex)')
-            bibtex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
-                                db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
-                                    spider.timestamp))
-        elif spider.output_format == 'fieldtagged':
-            print('爬取完成，开始导入数据库(fieldtagged/plaintext)')
-            plaintex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
-                                  db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
-                                      spider.timestamp))
+    # def close(spider, reason):
+    #     # 等到全部爬取完成后再解析并导入数据库
+    #     if spider.output_format == 'bibtex':
+    #         print('爬取完成，开始导入数据库(bibtex)')
+    #         bibtex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
+    #                             db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
+    #                                 spider.timestamp))
+    #     elif spider.output_format == 'fieldtagged':
+    #         print('爬取完成，开始导入数据库(fieldtagged/plaintext)')
+    #         plaintex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
+    #                               db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
+    #                                   spider.timestamp))

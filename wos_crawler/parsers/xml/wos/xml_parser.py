@@ -31,6 +31,7 @@ def parse_single(input_file=None, db_path=None, db_url=None):
         wos_document.abs = get_abs(name_space, record)
         wos_document.journal = get_journal(name_space, record)
         wos_document.journal_iso = get_journal_iso(name_space, record)
+        wos_document.journal_29 = get_journal_29(name_space, record)
         wos_document.publisher = get_publisher(name_space, record)
         wos_document.volume = get_volume(name_space, record)
         wos_document.issue = get_issue(name_space, record)
@@ -124,6 +125,13 @@ def get_journal_iso(name_space, record):
     # 找到期刊ISO缩写
     try:
         return record.find('./{0}static_data/{0}summary/{0}titles/{0}title[@type="abbrev_iso"]'.format(name_space)).text.lower()
+    except:
+        return None
+
+def get_journal_29(record):
+    # 找到期刊29字符缩写
+    try:
+        return record.find('./static_data/summary/titles/title[@type="abbrev_29"]').text.lower()
     except:
         return None
 
@@ -234,11 +242,15 @@ def get_authors(name_space, authors, record):
             try:
                 first_name = author.find('./{}first_name'.format(name_space)).text.lower()
                 last_name = author.find('./{}last_name'.format(name_space)).text.lower()
+                abbr_name = author.find('./{}wos_standard'.format(name_space)).text.lower().replace(',','')
+
             except:
                 # 团体作者只有fullname
                 first_name = None
                 last_name = full_name
-            wos_author = WosAuthor(first_name, last_name, author_order, is_reprint)
+                abbr_name = full_name
+
+            wos_author = WosAuthor(first_name, last_name, abbr_name,author_order, is_reprint)
             author_dict[full_name] = wos_author
 
     if len(author_dict) > 0:
