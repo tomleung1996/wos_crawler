@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import os
 import sys
 from parsers.bibtex.wos import bibtex_parser
-from parsers.plaintext.wos import plaintex_parser
+from parsers.plaintext.wos import plaintext_parser
 
 
 class WosJournalSpiderV2Spider(scrapy.Spider):
@@ -326,15 +326,15 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
             print('\033[1;30;47m {} \033[0m 最后一个文件下载完成，开始爬取下一本期刊\n'.format(journal_name))
             return Request(self.start_urls[0], method='GET', callback=self.parse, dont_filter=True)
 
-    def close(spider, reason):
-        # 等到全部爬取完成后再解析并导入数据库
-        if spider.output_format == 'bibtex':
-            print('爬取完成，开始导入数据库(bibtex)')
-            bibtex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
-                                db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
-                                    spider.timestamp))
-        elif spider.output_format == 'fieldtagged':
-            print('爬取完成，开始导入数据库(fieldtagged/plaintext)')
-            plaintex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
-                                  db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
-                                      spider.timestamp))
+    # def close(spider, reason):
+    #     # 等到全部爬取完成后再解析并导入数据库
+    #     if spider.output_format == 'bibtex':
+    #         print('爬取完成，开始导入数据库(bibtex)')
+    #         bibtex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
+    #                             db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
+    #                                 spider.timestamp))
+    #     elif spider.output_format == 'fieldtagged':
+    #         print('爬取完成，开始导入数据库(fieldtagged/plaintext)')
+    #         plaintex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
+    #                               db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
+    #                                   spider.timestamp))

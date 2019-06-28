@@ -1,6 +1,11 @@
-from sqlalchemy import Column, String, Integer, Text, ForeignKey
+from sqlalchemy import Column, String, Integer, Text, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from . import Base
+import hashlib
+
+inner_ref = Table('wos_inner_reference', Base.metadata,
+                        Column('citing_paper_id', String(20), ForeignKey('wos_document.unique_id'), primary_key=True),
+                        Column('cited_paper_id', String(20), ForeignKey('wos_document.unique_id'), primary_key=True))
 
 
 class WosDocument(Base):
@@ -30,6 +35,8 @@ class WosDocument(Base):
     funding_text = Column(Text)
     language = Column(String(20))
     author_email = Column(String(255))
+    first_author = Column(String(255))
+    document_md5 = Column(String(32), index=True)
 
     authors = relationship('WosAuthor', back_populates='document')
     categories = relationship('WosCategory', back_populates='document')
@@ -38,11 +45,14 @@ class WosDocument(Base):
     keyword_plus = relationship('WosKeywordPlus', back_populates='document')
     references = relationship('WosReference', back_populates='document')
     fundings = relationship('WosFunding', back_populates='document')
+    inner_references = relationship('WosDocument', secondary=inner_ref, backref='inner_citations',
+                                    primaryjoin=unique_id == inner_ref.c.citing_paper_id,
+                                    secondaryjoin=unique_id == inner_ref.c.cited_paper_id)
 
     def __init__(self, unique_id=None, title=None, abs=None, journal=None, journal_iso=None, journal_29=None,publisher=None,
                  volume=None, issue=None, start_page=None,end_page=None,pub_year=None, pub_month_day=None, document_type=None,
                  doi=None, cited_times=None, reference_num=None, usage_180=None, usage_since_2013=None,
-                 funding_text=None, language=None, author_email=None):
+                 funding_text=None, language=None, author_email=None, first_author=None):
         self.unique_id = unique_id
         self.title = title
         self.abs = abs
@@ -66,6 +76,7 @@ class WosDocument(Base):
         self.funding_text = funding_text
         self.language = language
         self.author_email = author_email
+        self.first_author = first_author
 
     def __repr__(self):
         return '文章唯一ID：{}，标题：{}'.format(self.unique_id, self.title)
@@ -178,6 +189,8 @@ class WosReference(Base):
     volume = Column(String(50)) # 有可能有AB卷
     start_page = Column(String(100)) #因为有电子出版的可能，所以有可能是E开头
     doi = Column(String(255), index=True)
+    document_md5 = Column(String(32), index=True)
+
 
     def __init__(self, first_author, pub_year, journal, volume, start_page, doi):
         self.first_author = first_author
@@ -186,6 +199,19 @@ class WosReference(Base):
         self.volume = volume
         self.start_page = start_page
         self.doi = doi
+        if not first_author:
+            first_author = ''
+        if not journal:
+            journal = ''
+        if not volume:
+            volume = ''
+        if not start_page:
+            start_page = ''
+        if not pub_year:
+            pub_year = ''
+        if not doi:
+            doi = ''
+        self.document_md5 = hashlib.md5((','.join([first_author, journal, volume, start_page, pub_year, doi])).encode('utf-8')).hexdigest()
 
     def __repr__(self):
         return '文章{}的参考文献：{}, {}, {}, {}, {}, {}' \

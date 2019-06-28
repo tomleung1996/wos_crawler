@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import os
 import sys
 from parsers.bibtex.wos import bibtex_parser
-from parsers.plaintext.wos import plaintex_parser
+from parsers.plaintext.wos import plaintext_parser
 
 
 class WosJournalSpiderSpider(scrapy.Spider):
@@ -303,7 +303,7 @@ class WosJournalSpiderSpider(scrapy.Spider):
                                     spider.timestamp))
         elif spider.output_format == 'fieldtagged':
             print('爬取完成，开始导入数据库(fieldtagged/plaintext)')
-            plaintex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
-                                  db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
+            plaintext_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
+                                   db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
                                       spider.timestamp))
 

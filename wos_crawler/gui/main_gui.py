@@ -13,7 +13,7 @@ from scrapy.utils.project import get_project_settings
 from scrapy.crawler import CrawlerRunner
 from spiders.wos_advanced_query_spider import WosAdvancedQuerySpiderSpider
 from spiders.wos_journal_spider_v2 import WosJournalSpiderV2Spider
-import parsers.plaintext.wos.plaintex_parser
+import parsers.plaintext.wos.plaintext_parser
 import parsers.bibtex.wos.bibtex_parser
 import parsers.xml.wos.xml_parser_v3
 import time
@@ -235,7 +235,7 @@ class GuiCrawler(QMainWindow):
 
         if self.ui.radioButtonPlaintext.isChecked():
             file_format = 'Plaintext'
-            parser = parsers.plaintext.wos.plaintex_parser
+            parser = parsers.plaintext.wos.plaintext_parser
         elif self.ui.radioButtonBibtex.isChecked():
             file_format = 'Bibtex'
             parser = parsers.bibtex.wos.bibtex_parser

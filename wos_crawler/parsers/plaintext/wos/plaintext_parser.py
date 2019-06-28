@@ -1,8 +1,10 @@
 from model import get_engine, get_session
 from model.wos_document import *
 from parsers.bibtex.wos.customization import find_nth
+from sqlalchemy import or_, MetaData
 import re
 import os
+import hashlib
 
 
 def parse_single(input_file=None, db_path=None, db_url=None):
@@ -68,15 +70,23 @@ def parse_single(input_file=None, db_path=None, db_url=None):
                         pos = full_name.index(' ')
                     except:
                         pos = len(full_name)
-                author = WosAuthor(full_name[pos + 1:], full_name[:pos], initials_list[author_order-1].replace(',',''),author_order, 0)
+                author = WosAuthor(full_name[pos + 1:], full_name[:pos].strip(), initials_list[author_order-1].replace(',',''),author_order, 0)
                 author.document = wos_document
                 author_dict[full_name] = author
+
+                if author_order == 1:
+                    wos_document.first_author = initials_list[author_order-1].replace(',','')
+
                 author_order += 1
             elif cur_field == 'ca ':
                 group_author = line[3:]
                 initials_list.append(group_author)
                 author = WosAuthor(group_author, None, initials_list[author_order-1].replace(',',''), author_order, 0)
                 author_dict[group_author] = author
+
+                if author_order == 1:
+                    wos_document.first_author = initials_list[author_order-1].replace(',','')
+
                 author_order += 1
             elif cur_field == 'c1 ':
                 # 将机构地址绑定到前面提取到的作者上
@@ -229,7 +239,8 @@ def parse_single(input_file=None, db_path=None, db_url=None):
                 if journal is not None and len(journal) > 254:
                     journal = journal[:254]
 
-                ref = WosReference(first_author, pub_year, journal, volume, start_page, doi)
+                ref = WosReference(first_author.replace('.','').replace('. ','').replace(',','') if first_author else first_author,
+                                   pub_year, journal, volume, start_page, doi)
                 ref.document = wos_document
 
             elif cur_field == 'nr ':
@@ -330,7 +341,19 @@ def parse_single(input_file=None, db_path=None, db_url=None):
                             f = WosFunding(agent, None)
                             f.document = wos_document
                     funding_line = None
+                wos_document.document_md5 = document_hash(wos_document)
 
+                # TODO:排除非article和review文献，用完记得删除
+                # if (not 'article' in wos_document.document_type and not 'review' in wos_document.document_type) \
+                #         or 'early access' in wos_document.document_type or 'retracted' in wos_document.document_type\
+                #         or 'software' in wos_document.document_type or 'hardware' in wos_document.document_type\
+                #         or 'exhibit' in wos_document.document_type or 'database' in wos_document.document_type\
+                #         or 'book' in wos_document.document_type:
+                #     continue
+
+                # 统一处理一下超长截断问题
+                if len(wos_document.title) > 499:
+                    wos_document.title = wos_document.title[:499]
                 wos_document_list.append(wos_document)
 
 
@@ -339,6 +362,29 @@ def parse_single(input_file=None, db_path=None, db_url=None):
     session.commit()
     session.close()
     print('插入{}完成\n'.format(input_file))
+
+def document_hash(doc:WosDocument):
+    first_author = doc.first_author
+    journal_29 = doc.journal_29
+    volume = doc.volume
+    start_page = doc.start_page
+    pub_year = doc.pub_year
+    doi = doc.doi
+
+    if not first_author:
+        first_author = ''
+    if not journal_29:
+        journal_29 = ''
+    if not volume:
+        volume = ''
+    if not start_page:
+        start_page = ''
+    if not pub_year:
+        pub_year = ''
+    if not doi:
+        doi = ''
+    return hashlib.md5(
+        (','.join([first_author, journal_29, volume, start_page, pub_year, doi])).encode('utf-8')).hexdigest()
 
 
 def parse(input_dir=None, db_path=None, db_url=None):
@@ -349,9 +395,39 @@ def parse(input_dir=None, db_path=None, db_url=None):
             if file[-4:] == '.txt':
                 parse_single(os.path.join(root, file), db_path, db_url)
 
+    # 最后处理内部引证关系
+    print('开始处理内部引证关系……')
+    engine = get_engine(db_path, db_url)
+    Base.metadata.create_all(engine)
+    session = get_session(engine)
+
+    session.execute('INSERT INTO wos_inner_reference '
+                    'SELECT DISTINCT t1.document_unique_id AS citing_paper_id, t2.unique_id AS cited_paper_id '
+                    'FROM wos_reference t1 INNER JOIN wos_document t2 '
+                    'ON t1.document_md5 = t2.document_md5 OR t1.doi = t2.doi '
+                    'ORDER BY citing_paper_id, cited_paper_id')
+    session.commit()
+    session.close()
+
     print('全部解析完成')
 
 
 if __name__ == '__main__':
-    parse(input_dir=r'C:\Users\Tom\Desktop\advanced_query\2019-04-15-14.06.37',
-          db_path='C:/Users/Tom/Desktop/test-plain.db')
+    parse(input_dir=r'D:\wos爬取结果\数据补充\health',
+           db_url='mysql+pymysql://student:student@192.168.22.242:3306/health?charset=utf8mb4')
+
+    parse(input_dir=r'D:\wos爬取结果\数据补充\health_care',
+          db_url='mysql+pymysql://student:student@192.168.22.242:3306/health_care?charset=utf8mb4')
+
+    parse(input_dir=r'D:\wos爬取结果\数据补充\health_cs',
+          db_url='mysql+pymysql://student:student@192.168.22.242:3306/health_cs?charset=utf8mb4')
+
+    parse(input_dir=r'D:\wos爬取结果\数据补充\health_medicine',
+          db_url='mysql+pymysql://student:student@192.168.22.242:3306/health_medicine?charset=utf8mb4')
+
+    parse(input_dir=r'D:\wos爬取结果\数据补充\health_statistics',
+          db_url='mysql+pymysql://student:student@192.168.22.242:3306/health_statistics?charset=utf8mb4')
+
+    # parse(input_dir=r'D:\wos爬取结果\数据补充\health',
+    #        db_url='mysql+pymysql://student:student@192.168.22.242:3306/test?charset=utf8mb4')
+    pass

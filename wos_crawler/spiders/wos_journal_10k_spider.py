@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import os
 import sys
 from parsers.bibtex.wos import bibtex_parser
-from parsers.plaintext.wos import plaintex_parser
+from parsers.plaintext.wos import plaintext_parser
 
 
 class WosJournalSpiderV2Spider(scrapy.Spider):
@@ -56,7 +56,9 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         with open(self.JOURNAL_LIST_PATH) as file:
             for row in file:
                 # 策略一，手动分年份（对plos one可能需要逐年爬取）
-                self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '1900-1990'))
+                self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '1900-1950'))
+                self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '1951-1970'))
+                self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '1971-1990'))
                 self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '1991-2000'))
                 self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '2001-2010'))
                 self.JOURNAL_LIST.append((row.strip().replace('\n', '').upper(), '2011-2018'))

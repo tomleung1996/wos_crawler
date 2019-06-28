@@ -27,9 +27,9 @@ if __name__ == '__main__':
     #                  output_path=r'D:\wos爬取结果', output_format='fieldtagged', document_type='')
 
     # 按检索式下载
-    # crawl_by_query(query='SO="EUR PHYS J C" AND PY=(1900-2018)',
-    #                output_path='../output', output_format='fieldtagged', document_type='')
+    crawl_by_query(query='SO="Scientometrics" AND PY=(2010-2018)',
+                   output_path='../output', output_format='fieldtagged', document_type='Article')
 
     # 使用GUI下载
-    crawl_by_gui()
+    # crawl_by_gui()
     pass

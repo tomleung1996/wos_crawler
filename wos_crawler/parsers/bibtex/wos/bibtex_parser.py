@@ -176,7 +176,8 @@ def parse_single(input_file=None, db_path=None, db_url=None):
         # 解析参考文献信息
         if bib_db.entries[i]['cited-references'] is not None:
             for reference in bib_db.entries[i]['cited-references']:
-                ref = WosReference(reference[0], reference[1], reference[2], reference[3], reference[4], reference[5])
+                ref = WosReference(reference[0].replace('.','').replace('. ','').replace(',',''),
+                                   reference[1], reference[2], reference[3], reference[4], reference[5])
                 reference_list.append(ref)
             wos_document.references = reference_list
 
