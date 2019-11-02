@@ -384,7 +384,7 @@ def document_hash(doc:WosDocument):
     if not doi:
         doi = ''
     return hashlib.md5(
-        (','.join([first_author, journal_29, volume, start_page, pub_year, doi])).encode('utf-8')).hexdigest()
+        (','.join([first_author, journal_29, volume, start_page, pub_year])).encode('utf-8')).hexdigest()
 
 
 def parse(input_dir=None, db_path=None, db_url=None):
@@ -407,27 +407,12 @@ def parse(input_dir=None, db_path=None, db_url=None):
                     'ON t1.document_md5 = t2.document_md5 OR t1.doi = t2.doi '
                     'ORDER BY citing_paper_id, cited_paper_id')
     session.commit()
+    session.execute('DELETE FROM wos_inner_reference WHERE citing_paper_id = cited_paper_id')
+    session.commit()
     session.close()
 
     print('全部解析完成')
 
 
 if __name__ == '__main__':
-    parse(input_dir=r'D:\wos爬取结果\数据补充\health',
-           db_url='mysql+pymysql://student:student@192.168.22.242:3306/health?charset=utf8mb4')
-
-    parse(input_dir=r'D:\wos爬取结果\数据补充\health_care',
-          db_url='mysql+pymysql://student:student@192.168.22.242:3306/health_care?charset=utf8mb4')
-
-    parse(input_dir=r'D:\wos爬取结果\数据补充\health_cs',
-          db_url='mysql+pymysql://student:student@192.168.22.242:3306/health_cs?charset=utf8mb4')
-
-    parse(input_dir=r'D:\wos爬取结果\数据补充\health_medicine',
-          db_url='mysql+pymysql://student:student@192.168.22.242:3306/health_medicine?charset=utf8mb4')
-
-    parse(input_dir=r'D:\wos爬取结果\数据补充\health_statistics',
-          db_url='mysql+pymysql://student:student@192.168.22.242:3306/health_statistics?charset=utf8mb4')
-
-    # parse(input_dir=r'D:\wos爬取结果\数据补充\health',
-    #        db_url='mysql+pymysql://student:student@192.168.22.242:3306/test?charset=utf8mb4')
-    pass
+   pass
