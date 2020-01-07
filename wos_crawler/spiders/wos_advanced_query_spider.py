@@ -37,13 +37,14 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
 
     output_path_prefix = ''
 
-    def __init__(self, query = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged',gui=None, *args, **kwargs):
+    def __init__(self, query = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged',gui=None, sid=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.query = query
         self.output_path_prefix = output_path
         self.document_type = document_type
         self.output_format = output_format
         self.gui = gui
+        self.sid = sid
         self.downloaded = 0
 
         if query is None:
@@ -52,7 +53,9 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         if output_path is None:
             print('请指定有效的输出路径')
             sys.exit(-1)
-
+        if self.sid != '':
+            self.start_urls = ['http://apps.webofknowledge.com/WOS_GeneralSearch_input.do?SID={}&product=WOS&search_mode=GeneralSearch'.format(self.sid)]
+            print('使用给定的SID：', self.sid)
 
     def parse(self, response):
         """
