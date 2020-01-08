@@ -14,9 +14,9 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
     Base.metadata.create_all(engine)
     session = get_session(engine)
 
-    volume_pattern = re.compile(r'^v\d+$')
-    page_pattern = re.compile(r'^p\w*\d+$')
-    doi_pattern = re.compile(r'^doi \d+.+$')
+    volume_pattern = re.compile(r'^[Vv]\d+$')
+    page_pattern = re.compile(r'^[Pp]\w*\d+$')
+    doi_pattern = re.compile(r'^DOI \d+.+$')
     year_pattern = re.compile(r'^\d{4}$')
 
     print('正在解析{}……'.format(input_file))
@@ -38,18 +38,19 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
         funding_line = None
 
         for line in file.readlines():
-            line = line[:-1].lower()
+            # line = line[:-1].lower()
+            line = line[:-1]
 
             # 通过每一行的前三个字符来识别行的状态
             tmp = line[:3]
             if tmp != '   ':
                 cur_field = tmp
 
-            if cur_field == 'pt ':
+            if cur_field == 'PT ':
                 del wos_document
                 wos_document = WosDocument()
             # 获得作者的缩写
-            elif cur_field == 'au ':
+            elif cur_field == 'AU ':
                 if tmp == cur_field:
                     initials_list.clear()
                 full_name = line[3:]
@@ -58,7 +59,7 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
             # 需要处理用空格分割的特殊情况
             # 还需要处理匿名作者等无分割情况
             # 还需要处理团体作者单独放在CA字段的情况
-            elif cur_field == 'af ':
+            elif cur_field == 'AF ':
                 if tmp == cur_field:
                     author_dict.clear()
                     author_order = 1
@@ -78,7 +79,7 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
                     wos_document.first_author = initials_list[author_order-1].replace(',','')
 
                 author_order += 1
-            elif cur_field == 'ca ':
+            elif cur_field == 'CA ':
                 group_author = line[3:]
                 initials_list.append(group_author)
                 author = WosAuthor(group_author, None, initials_list[author_order-1].replace(',',''), author_order, 0)
@@ -88,7 +89,7 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
                     wos_document.first_author = initials_list[author_order-1].replace(',','')
 
                 author_order += 1
-            elif cur_field == 'c1 ':
+            elif cur_field == 'C1 ':
                 # 将机构地址绑定到前面提取到的作者上
                 author_affiliation = line[3:]
                 try:
@@ -100,7 +101,7 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
                 for author in authors:
                     affiliation = WosAffiliation(author_affiliation[pos + 2:-1])
                     affiliation.author = author_dict[author]
-            elif cur_field == 'rp ':
+            elif cur_field == 'RP ':
                 # 确定通讯作者
                 rp_author_affiliations = line[3:].split('; ')
                 for rp_author_affiliation in rp_author_affiliations:
@@ -116,49 +117,49 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
                     for author in author_dict.keys():
                         if author_dict[author].author_order == rp_index:
                             author_dict[author].is_reprint_author = 1
-            elif cur_field == 'ti ':
+            elif cur_field == 'TI ':
                 title = line[3:]
                 if wos_document.title is not None:
                     wos_document.title += ' ' + title
                 else:
                     wos_document.title = title
-            elif cur_field == 'so ':
+            elif cur_field == 'SO ':
                 if journal_line is not None:
                     journal_line += ' ' + line[3:]
                 else:
                     journal_line = line[3:]
-            elif cur_field == 'la ':
+            elif cur_field == 'LA ':
                 wos_document.language = line[3:]
-            elif cur_field == 'dt ':
+            elif cur_field == 'DT ':
                 wos_document.document_type = line[3:]
-            elif cur_field == 'de ':
+            elif cur_field == 'DE ':
                 if keyword_line is not None:
                     keyword_line += ' ' + line[3:]
                 else:
                     keyword_line = line[3:]
-            elif cur_field == 'id ':
+            elif cur_field == 'ID ':
                 if keyword_plus_line is not None:
                     keyword_plus_line += ' ' + line[3:]
                 else:
                     keyword_plus_line = line[3:]
-            elif cur_field == 'ab ':
+            elif cur_field == 'AB ':
                 if wos_document.abs is not None:
                     wos_document.abs += ' ' + line[3:]
                 else:
                     wos_document.abs = line[3:]
-            elif cur_field == 'em ':
+            elif cur_field == 'EM ':
                 wos_document.author_email = line[3:].replace(' ', '')
-            elif cur_field == 'fu ':
+            elif cur_field == 'FU ':
                 if funding_line is not None:
                     funding_line += ' ' + line[3:]
                 else:
                     funding_line = line[3:]
-            elif cur_field == 'fx ':
+            elif cur_field == 'FX ':
                 if wos_document.funding_text is not None:
                     wos_document.funding_text += ' ' + line[3:]
                 else:
                     wos_document.funding_text = line[3:]
-            elif cur_field == 'cr ':
+            elif cur_field == 'CR ':
                 # 解析参考文献
 
                 reference = line[3:]
@@ -196,7 +197,7 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
                             start_page = ref_split[i_part][1:]
                             i_list.append(i_part)
                         elif doi_match:
-                            doi = ref_split[i_part].replace('doi ', '').replace('[', '').replace(']', '')
+                            doi = ref_split[i_part].lower().replace('doi ', '').replace('[', '').replace(']', '')
                             i_list.append(i_part)
 
                     i_list.sort()
@@ -243,47 +244,47 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
                                    pub_year, journal, volume, start_page, doi)
                 ref.document = wos_document
 
-            elif cur_field == 'nr ':
+            elif cur_field == 'NR ':
                 wos_document.reference_num = int(line[3:])
-            elif cur_field == 'tc ':
+            elif cur_field == 'TC ':
                 wos_document.cited_times = int(line[3:])
-            elif cur_field == 'u1 ':
+            elif cur_field == 'U1 ':
                 wos_document.usage_180 = int(line[3:])
-            elif cur_field == 'u2':
+            elif cur_field == 'U2':
                 wos_document.usage_since_2013 = int(line[3:])
-            elif cur_field == 'pu ':
+            elif cur_field == 'PU ':
                 wos_document.publisher = line[3:]
-            elif cur_field == 'ji ':
+            elif cur_field == 'JI ':
                 wos_document.journal_iso = line[3:]
-            elif cur_field == 'j9 ':
+            elif cur_field == 'J9 ':
                 wos_document.journal_29 = line[3:]
-            elif cur_field == 'pd ':
+            elif cur_field == 'PD ':
                 wos_document.pub_month_day = line[3:]
-            elif cur_field == 'py ':
+            elif cur_field == 'PY ':
                 wos_document.pub_year = line[3:]
-            elif cur_field == 'vl ':
+            elif cur_field == 'VL ':
                 wos_document.volume = line[3:]
-            elif cur_field == 'is ':
+            elif cur_field == 'IS ':
                 wos_document.issue = line[3:]
-            elif cur_field == 'bp ':
+            elif cur_field == 'BP ':
                 wos_document.start_page = line[3:]
-            elif cur_field == 'ep ':
+            elif cur_field == 'EP ':
                 wos_document.end_page = line[3:]
-            elif cur_field == 'di ':
+            elif cur_field == 'DI ':
                 wos_document.doi = line[3:]
-            elif cur_field == 'wc ':
+            elif cur_field == 'WC ':
                 if wos_category_line is not None:
                     wos_category_line += ' ' + line[3:]
                 else:
                     wos_category_line = line[3:]
-            elif cur_field == 'sc ':
+            elif cur_field == 'SC ':
                 if research_area_line is not None:
                     research_area_line += ' ' + line[3:]
                 else:
                     research_area_line = line[3:]
-            elif cur_field == 'ut ':
+            elif cur_field == 'UT ':
                 wos_document.unique_id = line[7:]
-            elif cur_field == 'er':
+            elif cur_field == 'ER':
                 # 在最后一行处理多行字段的问题
                 if journal_line is not None:
                     wos_document.journal = journal_line
@@ -368,7 +369,6 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
     print('插入{}完成\n'.format(input_file))
     return exist_set
 
-
 def document_hash(doc:WosDocument):
     first_author = doc.first_author
     journal_29 = doc.journal_29
@@ -390,7 +390,7 @@ def document_hash(doc:WosDocument):
     if not doi:
         doi = ''
     return hashlib.md5(
-        (','.join([first_author, journal_29, volume, start_page, pub_year])).encode('utf-8')).hexdigest()
+        (','.join([first_author.lower(), journal_29.lower(), volume.lower(), start_page.lower(), pub_year.lower()])).encode('utf-8')).hexdigest()
 
 
 def parse(input_dir=None, db_path=None, db_url=None):
@@ -410,7 +410,7 @@ def parse(input_dir=None, db_path=None, db_url=None):
     Base.metadata.create_all(engine)
     session = get_session(engine)
 
-    session.execute('INSERT INTO wos_inner_reference '
+    session.execute('REPLACE INTO wos_inner_reference '
                     'SELECT DISTINCT t1.document_unique_id AS citing_paper_id, t2.unique_id AS cited_paper_id '
                     'FROM wos_reference t1 INNER JOIN wos_document t2 '
                     'ON t1.document_md5 = t2.document_md5 OR t1.doi = t2.doi '
@@ -424,4 +424,6 @@ def parse(input_dir=None, db_path=None, db_url=None):
 
 
 if __name__ == '__main__':
-   pass
+    parse(input_dir=r'C:\Users\Tom\Desktop\genome editing related',
+          db_path=r'C:\Users\Tom\Desktop\tresult')
+    pass
