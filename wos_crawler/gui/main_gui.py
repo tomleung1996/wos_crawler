@@ -12,7 +12,7 @@ from gui.tab_gui_crawler import *
 from scrapy.utils.project import get_project_settings
 from scrapy.crawler import CrawlerRunner
 from spiders.wos_advanced_query_spider import WosAdvancedQuerySpiderSpider
-from spiders.wos_journal_spider_v2 import WosJournalSpiderV2Spider
+from spiders.wos_sequential_journal_spider import WosSequentialJournalSpiderSpider
 import parsers.plaintext.wos.plaintext_parser
 import parsers.bibtex.wos.bibtex_parser
 import parsers.xml.wos.xml_parser_v3

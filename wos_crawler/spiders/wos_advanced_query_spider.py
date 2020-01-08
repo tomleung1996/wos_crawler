@@ -26,22 +26,12 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
     db_pattern = r'WOS\.(\w+)'
     db_list = []
 
-    #目标文献类型
-    document_type = 'Article'
-
-    #导出文献格式
-    output_format = 'bibtex'
-
-    #在这里输入检索式
-    query = None
-
-    output_path_prefix = ''
-
-    def __init__(self, query = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged',gui=None, sid=None, *args, **kwargs):
+    def __init__(self, query=None, output_path='../output', document_type='', output_format='fieldtagged', gui=None, sid=None, *args, **kwargs):
+        assert query is not None and document_type is not None
         super().__init__(*args, **kwargs)
         self.query = query
         self.output_path_prefix = output_path
-        self.document_type = document_type
+        self.document_type = '###'.join(document_type.split(','))
         self.output_format = output_format
         self.gui = gui
         self.sid = sid
@@ -53,7 +43,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         if output_path is None:
             print('请指定有效的输出路径')
             sys.exit(-1)
-        if self.sid != '':
+        if self.sid != '' and self.sid != 'None':
             self.start_urls = ['http://apps.webofknowledge.com/WOS_GeneralSearch_input.do?SID={}&product=WOS&search_mode=GeneralSearch'.format(self.sid)]
             print('使用给定的SID：', self.sid)
 
@@ -77,11 +67,6 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
             sid = None
             exit(-1)
 
-        # filename = 'test/landing-page-' + str(time.time()) + '-' + sid + '.html'
-        # os.makedirs(os.path.dirname(filename), exist_ok=True)
-        # with open(filename, 'w', encoding='utf-8') as file:
-        #     file.write(response.text)
-
         # 获取已购买的WOS核心数据库信息
         soup = BeautifulSoup(response.text, 'lxml')
         db_str = str(soup.find('select', attrs={'id': 'ss_showsuggestions'}).get('onchange'))
@@ -93,8 +78,6 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
 
         # 提交post高级搜索请求
         adv_search_url = 'http://apps.webofknowledge.com/WOS_AdvancedSearch.do'
-        #检索式，目前设定为期刊，稍作修改可以爬取任意检索式
-
         query_form = {
             "product": "WOS",
             "search_mode": "AdvancedSearch",
@@ -144,11 +127,6 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         sid = response.meta['sid']
         query = response.meta['query']
 
-        # filename = 'test/result-entry' + str(time.time()) + '-' + sid + '.html'
-        # os.makedirs(os.path.dirname(filename), exist_ok=True)
-        # with open(filename, 'w', encoding='utf-8') as file:
-        #     file.write(response.text)
-
         #通过bs4解析html找到检索结果的入口
         soup = BeautifulSoup(response.text, 'lxml')
         entry_url = soup.find('a', attrs={'title': 'Click to view the results'}).get('href')
@@ -173,11 +151,6 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         sid = response.meta['sid']
         query = response.meta['query']
         qid = response.meta['qid']
-
-        # filename = 'test/results-' + str(time.time()) + '-' + sid + '.html'
-        # os.makedirs(os.path.dirname(filename), exist_ok=True)
-        # with open(filename, 'w', encoding='utf-8') as file:
-        #     file.write(response.text)
 
         #通过bs4获取页面结果数字，得到需要分批爬取的批次数
         soup = BeautifulSoup(response.text, 'lxml')

@@ -11,8 +11,8 @@ from parsers.bibtex.wos import bibtex_parser
 from parsers.plaintext.wos import plaintext_parser
 
 
-class WosJournalSpiderV2Spider(scrapy.Spider):
-    name = 'wos_journal_spider_v2'
+class WosSequentialJournalSpiderSpider(scrapy.Spider):
+    name = 'wos_sequential_journal_spider'
     allowed_domains = ['webofknowledge.com']
     start_urls = ['http://www.webofknowledge.com/']
     timestamp = str(time.strftime('%Y-%m-%d-%H.%M.%S', time.localtime(time.time())))
@@ -25,24 +25,14 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
     db_pattern = r'WOS\.(\w+)'
     db_list = []
 
-    # 目标文献类型
-    document_type = 'Article'
-
-    # 导出文献格式
-    output_format = 'bibtex'
-
-    # 待爬取期刊列表和列表存放的位置
-    JOURNAL_LIST = []
-    # JOURNAL_LIST_PATH = r'C:\Users\Tom\PycharmProjects\wos_crawler\wos_crawler\input\journal_list.txt'
-    JOURNAL_LIST_PATH = None
-    output_path_prefix = ''
-
-    def __init__(self, journal_list_path=None, output_path='../output', document_type='Article',
+    def __init__(self, journal_list_path=None, output_path='../output', document_type='',
                  output_format='fieldtagged', gui=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.JOURNAL_LIST = []
         self.JOURNAL_LIST_PATH = journal_list_path
         self.output_path_prefix = output_path
-        self.document_type = document_type
+        self.document_type = '###'.join(document_type.split(','))
+        print(self.document_type)
         self.output_format = output_format
         self.gui = gui
 
@@ -83,9 +73,6 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         :param response:
         :return:
         """
-        # if len(self.JOURNAL_LIST) <= 0:
-        #     print('**待爬取期刊已全部加入队列，不再产生新的异步请求，请等待现有的请求执行完成**')
-        #     return
 
         # 获得当前要爬取的期刊名称
         # journal_name = self.JOURNAL_LIST.pop(0)
@@ -114,7 +101,7 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
             # 提交post高级搜索请求
             adv_search_url = 'http://apps.webofknowledge.com/WOS_AdvancedSearch.do'
             # 检索式，目前设定为期刊，稍作修改可以爬取任意检索式
-            query = 'SO="{}" AND PY=(1900-2018)'.format(journal_name.upper())
+            query = 'SO="{}"'.format(journal_name.upper())
 
             query_form = {
                 "product": "WOS",
@@ -154,10 +141,6 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
                                callback=self.parse_result_entry,
                                meta={'sid': sid, 'journal_name': journal_name, 'query': query})
 
-        # 一个检索式爬取完成后，yield一个新的Request，相当于一个尾递归实现的循环功能，
-        # 好处是每个检索式都是用不同的SID来爬取的
-        # yield Request(self.start_urls[0], callback=self.parse, dont_filter=True, meta={})
-
     def parse_result_entry(self, response):
         """
         找到高级检索结果入口链接，交给parse_results处理
@@ -169,11 +152,6 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         journal_name = response.meta['journal_name']
         query = response.meta['query']
         # cookiejar = response.meta['cookiejar']
-
-        # filename = 'test/result-entry' + str(time.time()) + '-' + sid + '.html'
-        # os.makedirs(os.path.dirname(filename), exist_ok=True)
-        # with open(filename, 'w', encoding='utf-8') as file:
-        #     file.write(response.text)
 
         # 通过bs4解析html找到检索结果的入口
         soup = BeautifulSoup(response.text, 'lxml')
@@ -200,11 +178,6 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         query = response.meta['query']
         qid = response.meta['qid']
         # cookiejar = response.meta['cookiejar']
-
-        # filename = 'test/results-' + str(time.time()) + '-' + sid + '.html'
-        # os.makedirs(os.path.dirname(filename), exist_ok=True)
-        # with open(filename, 'w', encoding='utf-8') as file:
-        #     file.write(response.text)
 
         # 通过bs4获取页面结果数字，得到需要分批爬取的批次数
         soup = BeautifulSoup(response.text, 'lxml')
@@ -293,12 +266,6 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
         paper_num = response.meta['paper_num']
 
         # 按期刊名称保存文件
-
-        # filename = self.output_path_prefix + '/journal/{}/{}/{}.{}'.format(self.timestamp,
-        #                                                                    journal_name + '-' + str(paper_num),
-        #                                                                    journal_name + '-' + str(start) + '-' + str(
-        #                                                                        end),
-        #                                                                    file_postfix)
         filename = self.output_path_prefix + '/journal/{}/{}.{}'.format(journal_name + '-' + str(paper_num),
                                                                            journal_name + '-' + str(start) + '-' + str(
                                                                                end),
@@ -326,15 +293,15 @@ class WosJournalSpiderV2Spider(scrapy.Spider):
             print('\033[1;30;47m {} \033[0m 最后一个文件下载完成，开始爬取下一本期刊\n'.format(journal_name))
             return Request(self.start_urls[0], method='GET', callback=self.parse, dont_filter=True)
 
-    # def close(spider, reason):
-    #     # 等到全部爬取完成后再解析并导入数据库
-    #     if spider.output_format == 'bibtex':
-    #         print('爬取完成，开始导入数据库(bibtex)')
-    #         bibtex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
-    #                             db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
-    #                                 spider.timestamp))
-    #     elif spider.output_format == 'fieldtagged':
-    #         print('爬取完成，开始导入数据库(fieldtagged/plaintext)')
-    #         plaintex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
-    #                               db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
-    #                                   spider.timestamp))
+    def close(spider, reason):
+        # 等到全部爬取完成后再解析并导入数据库
+        if spider.output_format == 'bibtex':
+            print('爬取完成，开始导入数据库(bibtex)')
+            bibtex_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
+                                db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
+                                    spider.timestamp))
+        elif spider.output_format == 'fieldtagged':
+            print('爬取完成，开始导入数据库(fieldtagged/plaintext)')
+            plaintext_parser.parse(input_dir=spider.output_path_prefix + '/journal/{}'.format(spider.timestamp),
+                                  db_path=spider.output_path_prefix + '/journal/{}/result.db'.format(
+                                      spider.timestamp))

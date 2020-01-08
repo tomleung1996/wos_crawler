@@ -11,8 +11,8 @@ from parsers.bibtex.wos import bibtex_parser
 from parsers.plaintext.wos import plaintext_parser
 
 
-class WosJournalSpiderSpider(scrapy.Spider):
-    name = 'wos_journal_spider'
+class WosAsynchronousJournalSpiderSpider(scrapy.Spider):
+    name = 'wos_asynchronous_journal_spider'
     allowed_domains = ['webofknowledge.com']
     start_urls = ['http://www.webofknowledge.com/']
     timestamp = str(time.strftime('%Y-%m-%d-%H.%M.%S',time.localtime(time.time())))
@@ -25,26 +25,14 @@ class WosJournalSpiderSpider(scrapy.Spider):
     db_pattern = r'WOS\.(\w+)'
     db_list = []
 
-    # 目标文献类型
-    document_type = 'Article'
-
-    # 导出文献格式
-    output_format = 'bibtex'
-
-    #待爬取期刊列表和列表存放的位置
-    JOURNAL_LIST = []
-    # JOURNAL_LIST_PATH = r'C:\Users\Tom\PycharmProjects\wos_crawler\wos_crawler\input\journal_list.txt'
-    JOURNAL_LIST_PATH = None
-    output_path_prefix = ''
-
-    def __init__(self, journal_list_path = None, output_path = '../output', document_type='Article',output_format = 'fieldtagged',gui=None, *args, **kwargs):
+    def __init__(self, journal_list_path=None, output_path='../output', document_type='', output_format='fieldtagged', gui=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.JOURNAL_LIST_PATH = journal_list_path
+        self.JOURNAL_LIST = []
         self.output_path_prefix = output_path
-        self.document_type = document_type
+        self.document_type = '###'.join(document_type.split(','))
         self.output_format = output_format
         self.gui = gui
-
 
         if journal_list_path is None:
             print('请指定期刊列表')
@@ -158,11 +146,6 @@ class WosJournalSpiderSpider(scrapy.Spider):
         journal_name = response.meta['journal_name']
         query = response.meta['query']
 
-        # filename = 'test/result-entry' + str(time.time()) + '-' + sid + '.html'
-        # os.makedirs(os.path.dirname(filename), exist_ok=True)
-        # with open(filename, 'w', encoding='utf-8') as file:
-        #     file.write(response.text)
-
         #通过bs4解析html找到检索结果的入口
         soup = BeautifulSoup(response.text, 'lxml')
         entry_url = soup.find('a', attrs={'title': 'Click to view the results'}).get('href')
@@ -187,11 +170,6 @@ class WosJournalSpiderSpider(scrapy.Spider):
         journal_name = response.meta['journal_name']
         query = response.meta['query']
         qid = response.meta['qid']
-
-        # filename = 'test/results-' + str(time.time()) + '-' + sid + '.html'
-        # os.makedirs(os.path.dirname(filename), exist_ok=True)
-        # with open(filename, 'w', encoding='utf-8') as file:
-        #     file.write(response.text)
 
         #通过bs4获取页面结果数字，得到需要分批爬取的批次数
         soup = BeautifulSoup(response.text, 'lxml')
@@ -282,13 +260,6 @@ class WosJournalSpiderSpider(scrapy.Spider):
             file.write(text)
 
         print('--成功下载 {} 的第 {} 到第 {} 条文献--'.format(journal_name, start, end))
-
-        # 解析并导入数据库
-        # if self.output_format == 'bibtex':
-        #     item = WosBibtexItem()
-        #     item['filename'] = filename
-        #     item['output_path'] = '/'.join(filename.split('/')[:-2]) + '/{}-result.db'.format(self.timestamp)
-        #     yield item
 
         self.downloaded += end - start + 1
         if self.gui is not None:
