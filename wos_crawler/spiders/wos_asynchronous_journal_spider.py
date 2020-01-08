@@ -25,7 +25,7 @@ class WosAsynchronousJournalSpiderSpider(scrapy.Spider):
     db_pattern = r'WOS\.(\w+)'
     db_list = []
 
-    def __init__(self, journal_list_path=None, output_path='../output', document_type='', output_format='fieldtagged', gui=None, *args, **kwargs):
+    def __init__(self, journal_list_path=None, output_path='../output', document_type='', output_format='fieldtagged', gui=None, sid=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.JOURNAL_LIST_PATH = journal_list_path
         self.JOURNAL_LIST = []
@@ -33,6 +33,7 @@ class WosAsynchronousJournalSpiderSpider(scrapy.Spider):
         self.document_type = '###'.join(document_type.split(','))
         self.output_format = output_format
         self.gui = gui
+        self.sid = sid
 
         if journal_list_path is None:
             print('请指定期刊列表')
@@ -69,15 +70,18 @@ class WosAsynchronousJournalSpiderSpider(scrapy.Spider):
         journal_name = self.JOURNAL_LIST.pop(0)
 
         #获取SID
-        pattern = re.compile(self.sid_pattern)
-        result = re.search(pattern, response.url)
-        if result is not None:
-            sid = result.group(1)
-            print('{} 提取得到SID：'.format(journal_name), result.group(1))
+        if self.sid == '' or self.sid == 'None':
+            pattern = re.compile(self.sid_pattern)
+            result = re.search(pattern, response.url)
+            if result is not None:
+                self.sid = result.group(1)
+                print('{} 提取得到SID：'.format(journal_name), result.group(1))
+            else:
+                print('{} SID提取失败'.format(journal_name))
+                self.sid = None
+                exit(-1)
         else:
-            print('{} SID提取失败'.format(journal_name))
-            sid = None
-            exit(-1)
+            print('使用给定的SID：', self.sid)
 
         # 获取已购买的WOS核心数据库信息
         soup = BeautifulSoup(response.text, 'lxml')
@@ -96,7 +100,7 @@ class WosAsynchronousJournalSpiderSpider(scrapy.Spider):
         query_form = {
             "product": "WOS",
             "search_mode": "AdvancedSearch",
-            "SID": sid,
+            "SID": self.sid,
             "input_invalid_notice": "Search Error: Please enter a search term.",
             "input_invalid_notice_limits": " <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.",
             "action": "search",
@@ -129,7 +133,7 @@ class WosAsynchronousJournalSpiderSpider(scrapy.Spider):
         #同时通过meta参数为下一个处理函数传递sid、journal_name等有用信息
         yield FormRequest(adv_search_url, method='POST', formdata=query_form, dont_filter=True,
                           callback=self.parse_result_entry,
-                          meta={'sid': sid, 'journal_name': journal_name, 'query': query})
+                          meta={'sid': self.sid, 'journal_name': journal_name, 'query': query})
 
         #一个检索式爬取完成后，yield一个新的Request，相当于一个尾递归实现的循环功能，
         #好处是每个检索式都是用不同的SID来爬取的

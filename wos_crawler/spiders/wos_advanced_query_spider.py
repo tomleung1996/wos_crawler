@@ -57,15 +57,16 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         """
 
         #获取SID
-        pattern = re.compile(self.sid_pattern)
-        result = re.search(pattern, response.url)
-        if result is not None:
-            sid = result.group(1)
-            print('提取得到SID：', result.group(1))
-        else:
-            print('SID提取失败')
-            sid = None
-            exit(-1)
+        if self.sid == '' or self.sid == 'None':
+            pattern = re.compile(self.sid_pattern)
+            result = re.search(pattern, response.url)
+            if result is not None:
+                self.sid = result.group(1)
+                print('提取得到SID：', result.group(1))
+            else:
+                print('SID提取失败')
+                self.sid = None
+                exit(-1)
 
         # 获取已购买的WOS核心数据库信息
         soup = BeautifulSoup(response.text, 'lxml')
@@ -81,7 +82,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         query_form = {
             "product": "WOS",
             "search_mode": "AdvancedSearch",
-            "SID": sid,
+            "SID": self.sid,
             "input_invalid_notice": "Search Error: Please enter a search term.",
             "input_invalid_notice_limits": " <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.",
             "action": "search",
@@ -114,7 +115,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
         #同时通过meta参数为下一个处理函数传递sid、journal_name等有用信息
         yield FormRequest(adv_search_url, method='POST', formdata=query_form, dont_filter=True,
                           callback=self.parse_result_entry,
-                          meta={'sid': sid, 'query': self.query})
+                          meta={'sid': self.sid, 'query': self.query})
 
 
     def parse_result_entry(self, response):
