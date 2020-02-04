@@ -13,7 +13,7 @@
 
 ### 图形界面 
 
-- 将工程中的`main.py`文件第`36`行的`crawl_by_gui()`取消注释，执行程序启动图形界面
+- 将工程中的`main.py`文件第`33`行的`crawl_by_gui()`取消注释，执行程序启动图形界面
 
     （或者你也可以通过`from wos_crawler.main import crawl_by_gui()`来在你的程序中使用）
     
@@ -24,7 +24,7 @@
     ![](https://i.loli.net/2019/01/24/5c497e83c1cc5.png)
 
 ### Python API使用方法
-- 将工程中的`main.py`文件第`28-29`行（按期刊列表）或第`32-33`行（按高级检索式）取消注释，传递合法的参数进去，执行程序即可。爬取进度会在终端显示。
+- 将工程中的`main.py`文件第`25-26`行（按期刊列表）或第`29-30`行（按高级检索式）取消注释，传递合法的参数进去，执行程序即可。爬取进度会在终端显示。
 
     （或者你也可以通过`from wos_crawler.main import crawl_by_query, crawl_by_journal`来在你的程序中使用）
 
