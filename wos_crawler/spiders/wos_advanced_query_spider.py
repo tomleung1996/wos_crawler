@@ -26,7 +26,7 @@ class WosAdvancedQuerySpiderSpider(scrapy.Spider):
     db_pattern = r'WOS\.(\w+)'
     db_list = []
 
-    def __init__(self, query=None, output_path='../output', document_type='', output_format='fieldtagged', gui=None, sid=None, *args, **kwargs):
+    def __init__(self, query=None, output_path='../output', document_type='', output_format='fieldtagged', gui=None, sid='', *args, **kwargs):
         assert query is not None and document_type is not None
         super().__init__(*args, **kwargs)
         self.query = query

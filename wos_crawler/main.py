@@ -22,12 +22,12 @@ def crawl_by_gui():
 
 if __name__ == '__main__':
     # 按期刊下载
-    crawl_by_journal(journal_list_path=r'../input/journal_list.txt',
-                     output_path=r'../output', output_format='fieldtagged', document_type='', sid='')
+    # crawl_by_journal(journal_list_path=r'../input/journal_list.txt',
+    #                  output_path=r'../output', output_format='fieldtagged', document_type='', sid='')
 
     # 按检索式下载
-    # crawl_by_query(query='SO=(AM STAT)',
-    #                output_path='../output', output_format='fieldtagged', document_type='', sid='')
+    crawl_by_query(query='(SO=(SCIENCE) OR SO=(NATURE)) AND PY=(2003-2019)',
+                   output_path='../output', output_format='fieldtagged', document_type='Article,Review', sid='')
 
     # 使用GUI下载
     # crawl_by_gui()

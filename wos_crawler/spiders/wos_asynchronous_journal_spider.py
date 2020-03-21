@@ -25,7 +25,7 @@ class WosAsynchronousJournalSpiderSpider(scrapy.Spider):
     db_pattern = r'WOS\.(\w+)'
     db_list = []
 
-    def __init__(self, journal_list_path=None, output_path='../output', document_type='', output_format='fieldtagged', gui=None, sid=None, *args, **kwargs):
+    def __init__(self, journal_list_path=None, output_path='../output', document_type='', output_format='fieldtagged', gui=None, sid='', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.JOURNAL_LIST_PATH = journal_list_path
         self.JOURNAL_LIST = []

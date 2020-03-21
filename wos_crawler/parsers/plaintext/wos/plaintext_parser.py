@@ -89,6 +89,7 @@ def parse_single(input_file=None, db_path=None, db_url=None, exist_set=None):
 
                 author_order += 1
             elif cur_field == 'c1 ':
+                # TODO: wos早期的作者和机构没有绑定
                 # 将机构地址绑定到前面提取到的作者上
                 author_affiliation = line[3:]
                 try:
